@@ -58,7 +58,7 @@ int main(int argc,char **argv) {
   if(ep != NULL) {
     for(int i = 0;i < 48;++i) {
       *ep = 0;
-      *(ep - 1) = 0;
+      // *(ep - 1) = 0;
       ep -= 9;
     }
   }
