@@ -1,5 +1,5 @@
  /*
-  * File    : pvz.c
+  * File    : elfreader.c
   * Project : PVZ
   * Author  : ze00
   * Email   : zerozakiGeek@gmail.com
@@ -27,25 +27,13 @@ int main(int argc,char **argv) {
   Elf32_Ehdr *hdr = (Elf32_Ehdr *)rawHandle;
   Elf32_Shdr *sec = (Elf32_Shdr *)(rawHandle + hdr->e_shoff);
   unsigned shnum = hdr->e_shnum;
-  int *sym,*ep = NULL;
+  const char *stbl = rawHandle + getSectionTableHeader(hdr)->sh_offset;
   while(shnum != 0) {
-    if(sec->sh_type == SHT_PROGBITS) {
-      sym = (int *)(rawHandle + sec->sh_offset);
-      for(int i = 0;i < sec->sh_size / sizeof(int);++i) {
-        if(sym[i] == 5000 && sym[i-1] == 500) {
-          ep = &sym[i];
-        }
-      }
+    if(is(stbl,sec,".bss") || is(stbl,sec,".data")) {
+      printf("%s at offset %p\n",getSectionName(stbl,sec),(void *)sec->sh_addr);
     }
     ++sec;
     --shnum;
-  }
-  if(ep != NULL) {
-    for(int i = 0;i < 48;++i) {
-      *ep = 0;
-      // *(ep - 1) = 0;
-      ep -= 9;
-    }
   }
   close(fd);
   munmap(rawHandle,memsz);
