@@ -5,7 +5,7 @@
   * Email   : zerozakiGeek@gmail.com
   * Date    : 2017-08-15
   * Module  : 
-  * License : 
+  * License : MIT
   */
 #ifndef __PVZ_OFFSET__H
 #define __PVZ_OFFSET__H
@@ -20,7 +20,7 @@ struct pvz_offset {
   off_t offset;
 };
 struct pvz_offset pvz_off_tbl[] = {
-  { "coins" , OFF_MISC, 0x7d82f4 },
+  { "coins" , OFF_MISC, -8551532 },
   { "cannon", OFF_PLANTS, 12859004 },
 };
 off_t getOffset(const char *name) {
