@@ -29,8 +29,8 @@ int main(int argc,char **argv) {
   unsigned shnum = hdr->e_shnum;
   const char *stbl = rawHandle + getSectionTableHeader(hdr)->sh_offset;
   while(shnum != 0) {
-    if(is(stbl,sec,".bss") || is(stbl,sec,".data")) {
-      printf("%s at offset %p\n",getSectionName(stbl,sec),(void *)sec->sh_addr);
+    if(sec->sh_type == SHT_PROGBITS) {
+      printf("%s at Vaddr:%p\n",getSectionName(stbl,sec),(void *)sec->sh_addr);
     }
     ++sec;
     --shnum;

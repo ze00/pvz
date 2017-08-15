@@ -20,3 +20,9 @@
   gcc -o elfreader elfreader.c
   ./elfreader libpvz.so
 ```
+  * 使用交互式的游戏修改功能
+```
+  gcc -o cheater cheater.c
+  su
+  ./cheater
+```
