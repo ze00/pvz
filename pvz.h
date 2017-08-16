@@ -22,17 +22,19 @@
 #define SPECIFIC_DYNAMIC_LIBRARIES "libpvz.so"
 #endif
 #define BUFSIZE 255
+#define COINS_HELPER_BUFF 256
+#define COINS_HELPER_OFF 0x7aa300
 typedef char BufferType[BUFSIZE];
 typedef char ProcessDIR[PATH_MAX];
 typedef char Path[PATH_MAX];
 int isReadable(Path path) {
   return access(path,R_OK) == 0;
 }
-int findPVZProcess(ProcessDIR processDIR) {
+pid_t findPVZProcess(ProcessDIR processDIR) {
   DIR *dp = opendir("/proc");
   FILE *fp;
   struct dirent *dirHandle;
-  int pid = -1;
+  pid_t pid = -1;
   Path packageNameProvider;
   BufferType buf;
   while((dirHandle = readdir(dp))) {

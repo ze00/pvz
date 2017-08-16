@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pvz.h"
+#include "pvz_offset.h"
+#include "base.h"
 void checkRootState() {
   if(getuid() != 0 || getgid() != 0) {
     printf("must run me under root mode\n");
@@ -21,11 +23,12 @@ void checkRootState() {
 }
 int *getDynamicBase() {
   ProcessDIR processDIR;
-  int pid = findPVZProcess(processDIR);
+  pid_t pid = findPVZProcess(processDIR);
   if(pid == -1) {
     printf("cannot locate '%s'\n",SPECIFIC_PACKAGE);
     exit(-1);
   }
+  baseInfo.pid = pid;
   int *base = NULL;
   Path vmMaps;
   sprintf(vmMaps,"%s/maps",processDIR);
@@ -41,6 +44,24 @@ int *getDynamicBase() {
   return base;
 }
 void changeCoins(int newVal) {
+  char *helper = baseInfo.base + getOffset("coins"),*bp = helper + COINS_HELPER_OFF,*hp = bp;
+  char buf[COINS_HELPER_BUFF];
+  // baseInfo.base + getOffset("coins") + 0x7aa400;
+  sm_read_array(baseInfo.pid,bp,buf,COINS_HELPER_BUFF);
+  hp = buf;
+  off_t off;
+  for(off = 0;off < sizeof(buf);++off) {
+    if(*(int*)hp == helper) {
+      break;
+    }
+    hp++;
+  }
+  if(!sm_write_array(baseInfo.pid,bp + off - 4,&newVal,sizeof(newVal))) {
+    printf("set coins error\n");
+    exit(-1);
+  } else {
+    printf("now set coins to %d\n",newVal);
+  }
 }
 void drawMenu() {
   // TODO:implement this

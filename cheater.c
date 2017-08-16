@@ -17,7 +17,7 @@
 int main(int argc,char **argv) {
   checkRootState();
   int *base = getDynamicBase();
-  int v = 0;
-  // printf("%d\n",sm_write_array(pid,(char *)base + getOffset("cannon"),&v,4));
+  baseInfo.base = base;
+  changeCoins(999);
   return 0;
 }

@@ -19,8 +19,9 @@ struct pvz_offset {
   enum off_type type;
   off_t offset;
 };
+// 辅助地址-0xfd2060
 struct pvz_offset pvz_off_tbl[] = {
-  { "coins" , OFF_MISC, -8551532 },
+  { "coins" , OFF_MISC, -0xfd2060 },
   { "cannon", OFF_PLANTS, 12859004 },
 };
 off_t getOffset(const char *name) {
