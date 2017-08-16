@@ -19,5 +19,6 @@ int main(int argc,char **argv) {
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
   removeColdDown();
+  increaseCabbageHurler();
   return 0;
 }

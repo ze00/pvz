@@ -25,7 +25,8 @@ struct pvz_offset {
 struct pvz_offset pvz_off_tbl[] = {
   { "coins", OFF_MISC, -0xfd2060 },
   { "gargantuar", OFF_ZOMBIES, 0xc4c6c4 },
-  { "cannon", OFF_PLANTS, 0xc4367c },
+  { "cabbage", OFF_PLANTS, 0xc44460 },
+  { "cannon", OFF_PLANTS, 0xc4467c },
 };
 off_t getOffset(const char *name) {
   off_t off = -1;
@@ -34,8 +35,6 @@ off_t getOffset(const char *name) {
     pf = &pvz_off_tbl[i];
     if(strcmp(name,pf->name) == 0) {
       off = pf->offset;
-      if(pf->type == OFF_PLANTS)
-        off += 4096;
       break;
     }
   }

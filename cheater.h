@@ -69,13 +69,19 @@ void removeColdDown() {
   int *p = (int *)(base + getOffset("cannon")),val;
   for(int i = 0;i < 48;++i) {
     // sm_read_array(baseInfo.pid,p,&val,sizeof(int));
-    //.printf("%d\n",val);
+    // printf("%d\n",val);
     sm_write_array(baseInfo.pid,p,&val,sizeof(int));
     p -= 9;
   }
 }
 void letZombiesFragile() {
+  //TODO:implement this
   char *base = baseInfo.base;
   int *p = (int *)(base + getOffset("gargantuar")),val;
+}
+void increaseCabbageHurler() {
+  char *p = baseInfo.base + getOffset("cabbage");
+  int v = 45;
+  sm_write_array(baseInfo.pid,p + 8,&v,sizeof(int));
 }
 #endif //__CHEATER__H
