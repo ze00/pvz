@@ -1,6 +1,6 @@
  /*
   * File    : pvz_offset.h
-  * Project :
+  * Project : PVZ
   * Author  : ze00
   * Email   : zerozakiGeek@gmail.com
   * Date    : 2017-08-15
@@ -9,10 +9,12 @@
   */
 #ifndef __PVZ_OFFSET__H
 #define __PVZ_OFFSET__H
+#include <string.h>
 #include <sys/cdefs.h>
 enum off_type {
   OFF_MISC,
   OFF_PLANTS,
+  OFF_ZOMBIES,
 };
 struct pvz_offset {
   const char *name;
@@ -21,8 +23,9 @@ struct pvz_offset {
 };
 // 辅助地址-0xfd2060
 struct pvz_offset pvz_off_tbl[] = {
-  { "coins" , OFF_MISC, -0xfd2060 },
-  { "cannon", OFF_PLANTS, 12859004 },
+  { "coins", OFF_MISC, -0xfd2060 },
+  { "gargantuar", OFF_ZOMBIES, 0xc4c6c4 },
+  { "cannon", OFF_PLANTS, 0xc4367c },
 };
 off_t getOffset(const char *name) {
   off_t off = -1;

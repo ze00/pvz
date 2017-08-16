@@ -1,11 +1,11 @@
  /*
   * File    : base.h
-  * Project :
+  * Project : PVZ
   * Author  : ze00
   * Email   : zerozakiGeek@gmail.com
   * Date    : 2017-08-15
   * Module  : 
-  * License : 
+  * License : MIT
   */
 #ifndef __BASE__H
 #define __BASE__H

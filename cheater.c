@@ -1,6 +1,6 @@
  /*
   * File    : cheater.c
-  * Project :
+  * Project : PVZ
   * Author  : ze00
   * Email   : zerozakiGeek@gmail.com
   * Date    : 2017-08-15
@@ -17,7 +17,7 @@
 int main(int argc,char **argv) {
   checkRootState();
   int *base = getDynamicBase();
-  baseInfo.base = base;
-  changeCoins(999);
+  baseInfo.base = (char *)base;
+  removeColdDown();
   return 0;
 }

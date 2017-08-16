@@ -1,6 +1,6 @@
  /*
   * File    : cheater.h
-  * Project :
+  * Project : PVZ
   * Author  : ze00
   * Email   : zerozakiGeek@gmail.com
   * Date    : 2017-08-15
@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <scanmem/scanmem.h>
 #include "pvz.h"
 #include "pvz_offset.h"
 #include "base.h"
@@ -51,7 +52,7 @@ void changeCoins(int newVal) {
   hp = buf;
   off_t off;
   for(off = 0;off < sizeof(buf);++off) {
-    if(*(int*)hp == helper) {
+    if(*(int*)hp == (int)helper) {
       break;
     }
     hp++;
@@ -63,7 +64,18 @@ void changeCoins(int newVal) {
     printf("now set coins to %d\n",newVal);
   }
 }
-void drawMenu() {
-  // TODO:implement this
+void removeColdDown() {
+  char *base = baseInfo.base;
+  int *p = (int *)(base + getOffset("cannon")),val;
+  for(int i = 0;i < 48;++i) {
+    // sm_read_array(baseInfo.pid,p,&val,sizeof(int));
+    //.printf("%d\n",val);
+    sm_write_array(baseInfo.pid,p,&val,sizeof(int));
+    p -= 9;
+  }
+}
+void letZombiesFragile() {
+  char *base = baseInfo.base;
+  int *p = (int *)(base + getOffset("gargantuar")),val;
 }
 #endif //__CHEATER__H

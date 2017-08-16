@@ -33,4 +33,18 @@ void *getRawHandle(int fd,size_t *memsz) {
   *memsz = padding(st.st_size);
   return mmap(NULL,*memsz,PROT_READ | PROT_WRITE,MAP_SHARED,fd,0);
 }
+void dumpAt(char *rawHandle,Elf32_Shdr *sec,const char *stbl,int num) {
+  char *sym = rawHandle + sec->sh_offset;
+  size_t i = sec->sh_size;
+  while(i) {
+    if(*(int*)sym == num) {
+      printf("found at offset %p (%p,%s)\n",(void *)(sym - rawHandle),(void *)sec->sh_offset,getSectionName(stbl,sec));
+    }
+    ++sym;
+    --i;
+  }
+}
+void reportVaddr(const char *stbl,Elf32_Shdr *sec) {
+  printf("%s at Vaddr:%p\n",getSectionName(stbl,sec),(void *)sec->sh_addr);
+}
 #endif //__ELFUTILS__H

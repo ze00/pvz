@@ -12,8 +12,8 @@
 
   * 将植物的冷却时间以及单价都置0
 ```
-  gcc -o pvz pvz.c
-  ./pvz
+  gcc -o patcher patcher.c
+  ./patcher libpvz.so
 ```
   * 获取基址
 ```

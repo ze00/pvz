@@ -19,8 +19,13 @@
 #include "elfutils.h"
 int main(int argc,char **argv) {
   const char *fn = "libpvz.so";
-  if(argc == 2)
-    fn = argv[1];
+  int num = -1;
+  switch(argc) {
+    case 3:
+      num = atoi(argv[2]);
+    case 2:
+      fn = argv[1];
+  }
   int fd = open(fn,O_RDWR);
   size_t memsz;
   char *rawHandle = getRawHandle(fd,&memsz);
@@ -30,7 +35,11 @@ int main(int argc,char **argv) {
   const char *stbl = rawHandle + getSectionTableHeader(hdr)->sh_offset;
   while(shnum != 0) {
     if(sec->sh_type == SHT_PROGBITS) {
-      printf("%s at Vaddr:%p\n",getSectionName(stbl,sec),(void *)sec->sh_addr);
+      if(num != -1) {
+        dumpAt(rawHandle,sec,stbl,num);
+      } else {
+        reportVaddr(stbl,sec);
+      }
     }
     ++sec;
     --shnum;
