@@ -87,30 +87,44 @@ void removeColdDown() {
   }
 }
 void letZombiesFragile() {
-  size_t memsz = baseInfo.heap_end - baseInfo.heap_base,maxIndex = memsz - ZOM_HP_OFF,newHp;
+  size_t memsz = baseInfo.heap_end - baseInfo.heap_base,maxIndex = memsz - ZOM_HP_OFF;
   struct {
     size_t curHp;
     size_t totalHp;
   } Hp;
-  char *buf = (char *)malloc(memsz),*rp;
+  struct {
+    size_t newHp;
+  } newHp;
+  char *buf = (char *)malloc(memsz),*rp,*orig = buf;
   int *helper;
-  sm_read_array(baseInfo.pid,baseInfo.heap_base,buf,memsz);
-  for(size_t i = 0;i < maxIndex;++i) {
-    helper = (int *)buf;
-    if(helper[0] == 0xffffffff &&
-        helper[1] == 0x0 &&
-        helper[2] == 0xffffffff &&
-        helper[3] == 0xffffffff &&
-        helper[4] == 0) {
-      rp = baseInfo.heap_base + i + ZOM_HP_OFF;
-      sm_read_array(baseInfo.pid,rp,(char *)&Hp,sizeof(Hp));
-      if(Hp.totalHp >= 270 && Hp.totalHp <= 6000) {
-        newHp = Hp.curHp / 2;
-        printf("set %p (%zu,%zu)\n",rp,Hp.curHp,newHp);
-        sm_write_array(baseInfo.pid,rp,(char *)&newHp,sizeof(newHp));
-      }
+  // sm_read_array(baseInfo.pid,baseInfo.heap_base,buf,memsz);
+  while(1) {
+    buf = orig;
+    if(!sm_read_array(baseInfo.pid,baseInfo.heap_base,buf,memsz)) {
+      printf("cannot read memory,'%s' has died?\n",SPECIFIC_PACKAGE);
+      exit(-1);
     }
-    ++buf;
+    for(size_t i = 0;i < maxIndex;++i) {
+      helper = (int *)buf;
+      if(helper[0] == 0xffffffff &&
+          helper[1] == 0x0 &&
+          helper[2] == 0xffffffff &&
+          helper[3] == 0xffffffff &&
+          helper[4] == 0) {
+        rp = baseInfo.heap_base + i + ZOM_HP_OFF;
+        sm_read_array(baseInfo.pid,rp,(char *)&Hp,sizeof(Hp));
+        if(Hp.totalHp >= 270 && Hp.totalHp <= 6000) {
+          newHp.newHp = 10;
+          printf("set %p (%zu,%zu)\n",rp,Hp.curHp,newHp.newHp);
+          if(!sm_write_array(baseInfo.pid,rp,(char *)&newHp,sizeof(newHp))) {
+            printf("cannot write memory,'%s' has died?\n",SPECIFIC_PACKAGE);
+            exit(-1);
+          }
+        }
+      }
+      ++buf;
+    }
+    usleep(200000);
   }
   free(buf);
 }
