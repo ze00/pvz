@@ -11,6 +11,7 @@
 #define __PVZ_OFFSET__H
 #include <string.h>
 #include <sys/cdefs.h>
+#define ZOM_HP_OFF 0x54
 enum off_type {
   OFF_MISC,
   OFF_PLANTS,

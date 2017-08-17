@@ -11,8 +11,12 @@
 #define __BASE__H
 #include <unistd.h>
 #include <sys/cdefs.h>
+#include "pvz.h"
 struct {
   char *base;
+  char *heap_base;
+  char *heap_end;
   pid_t pid;
+  ProcessDIR processDIR;
 } baseInfo;
 #endif //__BASE__H
