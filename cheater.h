@@ -91,9 +91,12 @@ void letZombiesFragile() {
   struct {
     size_t curHp;
     size_t totalHp;
+    size_t armor;
   } Hp;
   struct {
     size_t newHp;
+    size_t totalHp;
+    size_t armor;
   } newHp;
   char *buf = (char *)malloc(memsz),*rp,*orig = buf;
   int *helper;
@@ -115,7 +118,7 @@ void letZombiesFragile() {
         sm_read_array(baseInfo.pid,rp,(char *)&Hp,sizeof(Hp));
         if(Hp.totalHp >= 270 && Hp.totalHp <= 6000) {
           newHp.newHp = 10;
-          printf("set %p (%zu,%zu)\n",rp,Hp.curHp,newHp.newHp);
+          printf("set %p (%zu %zu,%zu %zu)\n",rp,Hp.curHp,Hp.armor,newHp.newHp,newHp.armor);
           if(!sm_write_array(baseInfo.pid,rp,(char *)&newHp,sizeof(newHp))) {
             printf("cannot write memory,'%s' has died?\n",SPECIFIC_PACKAGE);
             exit(-1);
