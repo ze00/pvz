@@ -19,9 +19,9 @@ int main(int argc,char **argv) {
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
   baseInfo.heap_base = (char *)getHeapBase();
+  removeColdDown();
   letZombiesFragile();
   // removeColdDown();
   // increaseCabbageHurler();
-  // changeCoins(100000);
   return 0;
 }

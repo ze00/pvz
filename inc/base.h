@@ -11,7 +11,7 @@
 #define __BASE__H
 #include <unistd.h>
 #include <sys/cdefs.h>
-#include "pvz.h"
+#include "defs.h"
 struct {
   char *base;
   char *heap_base;

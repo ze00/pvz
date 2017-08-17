@@ -9,6 +9,7 @@
   */
 #ifndef __ELFUTILS__H
 #define __ELFUTILS__H
+#include <stdio.h>
 #include <string.h>
 #include <elf.h>
 #include <sys/stat.h>

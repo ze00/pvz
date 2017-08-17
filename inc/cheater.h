@@ -60,7 +60,7 @@ void changeCoins(int newVal) {
   char *helper = baseInfo.base + getOffset("coins"),*bp = helper + COINS_HELPER_OFF,*hp = bp;
   char buf[COINS_HELPER_BUFF];
   // baseInfo.base + getOffset("coins") + 0x7aa400;
-  sm_read_array(baseInfo.pid,bp,buf,COINS_HELPER_BUFF);
+  pvz_read(bp,buf,COINS_HELPER_BUFF);
   hp = buf;
   off_t off;
   for(off = 0;off < sizeof(buf);++off) {
@@ -69,20 +69,14 @@ void changeCoins(int newVal) {
     }
     hp++;
   }
-  if(!sm_write_array(baseInfo.pid,bp + off - 4,&newVal,sizeof(newVal))) {
-    printf("set coins error\n");
-    exit(-1);
-  } else {
-    printf("now set coins to %d\n",newVal);
-  }
+  pvz_write(bp + off - 4,&newVal,sizeof(newVal));
+  printf("now set coins to %d\n",newVal);
 }
 void removeColdDown() {
   char *base = baseInfo.base;
   int *p = (int *)(base + getOffset("cannon")),val;
   for(int i = 0;i < 48;++i) {
-    // sm_read_array(baseInfo.pid,p,&val,sizeof(int));
-    // printf("%d\n",val);
-    sm_write_array(baseInfo.pid,p,&val,sizeof(val));
+    pvz_write(p,&val,sizeof(val));
     p -= 9;
   }
 }
@@ -100,13 +94,9 @@ void letZombiesFragile() {
   } newHp;
   char *buf = (char *)malloc(memsz),*rp,*orig = buf;
   int *helper;
-  // sm_read_array(baseInfo.pid,baseInfo.heap_base,buf,memsz);
   while(1) {
     buf = orig;
-    if(!sm_read_array(baseInfo.pid,baseInfo.heap_base,buf,memsz)) {
-      printf("cannot read memory,'%s' has died?\n",SPECIFIC_PACKAGE);
-      exit(-1);
-    }
+    pvz_read(baseInfo.heap_base,buf,memsz);
     for(size_t i = 0;i < maxIndex;++i) {
       helper = (int *)buf;
       if(helper[0] == 0xffffffff &&
@@ -115,14 +105,12 @@ void letZombiesFragile() {
           helper[3] == 0xffffffff &&
           helper[4] == 0) {
         rp = baseInfo.heap_base + i + ZOM_HP_OFF;
-        sm_read_array(baseInfo.pid,rp,(char *)&Hp,sizeof(Hp));
-        if(Hp.totalHp >= 270 && Hp.totalHp <= 6000) {
+        memcpy(&Hp,buf + ZOM_HP_OFF,sizeof(Hp));
+        if(IN_RANGE(Hp.totalHp,270,6000)) {
           newHp.newHp = 10;
+          newHp.armor = 0;
           printf("set %p (%zu %zu,%zu %zu)\n",rp,Hp.curHp,Hp.armor,newHp.newHp,newHp.armor);
-          if(!sm_write_array(baseInfo.pid,rp,(char *)&newHp,sizeof(newHp))) {
-            printf("cannot write memory,'%s' has died?\n",SPECIFIC_PACKAGE);
-            exit(-1);
-          }
+          pvz_write(rp,&newHp,sizeof(newHp));
         }
       }
       ++buf;
@@ -134,6 +122,6 @@ void letZombiesFragile() {
 void increaseCabbageHurler() {
   char *p = baseInfo.base + getOffset("cabbage");
   int v = 45;
-  sm_write_array(baseInfo.pid,p + 8,&v,sizeof(v));
+  pvz_write(p + 8,&v,sizeof(v));
 }
 #endif //__CHEATER__H

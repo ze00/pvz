@@ -1,2 +1,3 @@
 $(TARGET):$(DEP)
-	$(CC) -o $@ $($(@)_src) $(addprefix -l,$($(@)_lib)) $(CC_FLAG)
+	@ echo "$($(@)_src) => $@"
+	@ $(CC) -o $@ $($(@)_src) $(addprefix -l,$($(@)_lib)) $(CC_FLAG)

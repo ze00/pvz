@@ -2,12 +2,12 @@ MODULE := \
 	patcher \
 	elfreader \
 	cheater
-cheater_lib := scanmem
-inc := $(shell ls *.h)
+inc := $(shell find inc)
 CC := gcc
-CC_FLAG := -g
+CC_FLAG := -g -Iinc
 all:$(MODULE)
-$(foreach m,$(MODULE),$(eval $(m)_src := $(m).c))
+$(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))
+cheater_lib := scanmem
 $(foreach m,$(MODULE),$(eval TARGET := $(m))$(eval DEP := $($(m)_src) $(inc))$(eval include build/reg_rule.mk))
 .PHONY:clean
 clean:

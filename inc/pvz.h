@@ -15,18 +15,8 @@
 #include <ctype.h>
 #include <limits.h>
 #include <unistd.h>
-#ifndef SPECIFIC_PACKAGE
-#define SPECIFIC_PACKAGE "com.popcap.pvz_na"
-#endif
-#ifndef SPECIFIC_DYNAMIC_LIBRARIES
-#define SPECIFIC_DYNAMIC_LIBRARIES "libpvz.so"
-#endif
-#define BUFSIZE 255
-#define COINS_HELPER_BUFF 256
-#define COINS_HELPER_OFF 0x7aa300
-typedef char BufferType[BUFSIZE];
-typedef char ProcessDIR[PATH_MAX];
-typedef char Path[PATH_MAX];
+#include <scanmem/scanmem.h>
+#include "base.h"
 int isReadable(Path path) {
   return access(path,R_OK) == 0;
 }
@@ -55,5 +45,17 @@ pid_t findPVZProcess(ProcessDIR processDIR) {
   }
   closedir(dp);
   return pid;
+}
+void pvz_write(void *rp,void *buf,size_t len) {
+  if(!sm_write_array(baseInfo.pid,rp,buf,len)) {
+    printf("cannot write memory,'%s' has died?\n",SPECIFIC_PACKAGE);
+    exit(-1);
+  }
+}
+void pvz_read(void *rp,void *buf,size_t len) {
+  if(!sm_read_array(baseInfo.pid,rp,buf,len)) {
+    printf("cannot read memory,'%s' has died?\n",SPECIFIC_PACKAGE);
+    exit(-1);
+  }
 }
 #endif //__PVZ__H
