@@ -80,15 +80,15 @@ void removeColdDown() {
     p -= 9;
   }
 }
-void createZombiesBuf() {
+void createHeapBuf() {
   size_t memsz = baseInfo.heap_end - baseInfo.heap_base;
-  baseInfo.zombies_buf_size = memsz;
-  baseInfo.zombies_buf = (char *)malloc(memsz);
+  baseInfo.heap_buf_size = memsz;
+  baseInfo.heap_buf = (char *)malloc(memsz);
 }
-void findAllZombies(void (*op)(void *,void *)) {
-  char *buf = baseInfo.zombies_buf;
-  pvz_read(baseInfo.heap_base,buf,baseInfo.zombies_buf_size);
-  size_t maxIndex = baseInfo.zombies_buf_size - 5;
+void findZombies(void (*op)(void *,void *)) {
+  char *buf = baseInfo.heap_buf;
+  pvz_read(baseInfo.heap_base,buf,baseInfo.heap_buf_size);
+  size_t maxIndex = baseInfo.heap_buf_size - ZOM_HP_OFF;
   int *helper;
   for(size_t i = 0;i < maxIndex;++i) {
     helper = (int *)buf;
@@ -106,7 +106,7 @@ void letZombiesFragile(void *dp,void *rp) {
   memcpy(&Hp,(char *)dp + ZOM_HP_OFF,sizeof(Hp));
   if(Hp.curHp != 10 && IN_RANGE(Hp.totalHp,270,6000)) {
     newHp.newHp = 10;
-    newHp.totalHp = Hp.totalHp;
+    newHp.totalHp = 0;
     newHp.armor = 0;
     pvz_write((char *)rp + ZOM_HP_OFF,&newHp,sizeof(newHp));
   }
@@ -123,6 +123,30 @@ void increaseCabbageHurler() {
   char *p = baseInfo.base + getOffset("cabbage");
   int v = 45;
   pvz_write(p + 8,&v,sizeof(v));
+}
+void findPlants(void (*op)(void *,void *)) {
+  char *buf = baseInfo.heap_buf;
+  pvz_read(baseInfo.heap_base,buf,baseInfo.heap_buf_size);
+  size_t maxIndex = baseInfo.heap_buf_size - PLAN_STATUS_OFF;
+  int *helper;
+  for(size_t i = 0;i < maxIndex;++i) {
+    helper = (int *)buf;
+    if(helper[0] == 0x43200000 && helper[1] == 0x42200000 && IN_RANGE(helper[PLAN_HP_OFF / sizeof(int)],300,8000)) {
+      op(helper,baseInfo.heap_base + i);
+    }
+    ++buf;
+  }
+}
+void report(void *__unused __,void *p) {
+  printf("found plant at %p\n",p);
+}
+void increasePlants(void *dp,void *rp) {
+  baseInfo.newVal = (*(int*)((char *)dp + PLAN_HP_OFF)) * 2;
+  pvz_write((char *)rp + PLAN_HP_OFF,&baseInfo.newVal,sizeof(baseInfo.newVal));
+}
+void increasePlantsAttack(void *dp,void *rp) {
+  baseInfo.newVal = (*(int*)((char *)dp + PLAN_ATT_TOTAL_OFF)) / 2;
+  pvz_write((char *)rp + PLAN_ATT_TOTAL_OFF,&baseInfo.newVal,sizeof(baseInfo.newVal));
 }
 void catchSIGINT() {
   fflush(stdout);

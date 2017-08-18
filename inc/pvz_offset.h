@@ -12,6 +12,11 @@
 #include <string.h>
 #include <sys/cdefs.h>
 #define ZOM_HP_OFF 0x54
+#define PLAN_HP_OFF 0x28
+#define PLAN_ATT_OFF 0x40
+#define PLAN_ATT_TOTAL_OFF 0x44
+#define PLAN_PEA_ATT_OFF 0x78
+#define PLAN_STATUS_OFF 0xa8
 enum off_type {
   OFF_MISC,
   OFF_PLANTS,

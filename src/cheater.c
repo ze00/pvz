@@ -20,7 +20,7 @@ int main(int argc,char **argv) {
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
   baseInfo.heap_base = (char *)getHeapBase();
-  createZombiesBuf();
+  createHeapBuf();
   int option;
   registeSigHandle();
   setjmp(env);
@@ -31,7 +31,10 @@ int main(int argc,char **argv) {
     puts("4.无冷却");
     puts("5.黄油糊脸");
     puts("6.僵尸加强二倍");
-    puts("7.退出");
+    puts("7.输出植物地址");
+    puts("8.植物血量增加二倍");
+    puts("9.植物攻速增加二倍");
+    puts("10.退出");
     printf("请选择:");
     if(scanf("%d",&option) == EOF) {
       // getchar();
@@ -51,7 +54,7 @@ int main(int argc,char **argv) {
         break;
       case 2:
         while(1) {
-          findAllZombies(letZombiesFragile);
+          findZombies(letZombiesFragile);
           usleep(500000);
         }
         break;
@@ -62,18 +65,27 @@ int main(int argc,char **argv) {
         removeColdDown();
         break;
       case 5:
-        findAllZombies(coverZombies);
+        findZombies(coverZombies);
         break;
       case 6:
-        findAllZombies(increaseZombies);
+        findZombies(increaseZombies);
         break;
       case 7:
-        free(baseInfo.zombies_buf);
+        findPlants(report);
+        break;
+      case 8:
+        findPlants(increasePlants);
+        break;
+      case 9:
+        findPlants(increasePlantsAttack);
+        break;
+      case 10:
+        free(baseInfo.heap_buf);
         return 0;
       default:
         printf("输入错误...\n");
     }
   }
-  free(baseInfo.zombies_buf);
+  free(baseInfo.heap_buf);
   return 0;
 }
