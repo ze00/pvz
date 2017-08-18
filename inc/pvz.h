@@ -58,4 +58,15 @@ void pvz_read(void *rp,void *buf,size_t len) {
     exit(-1);
   }
 }
+struct {
+  size_t curHp;
+  size_t totalHp;
+  size_t armor;
+} Hp;
+struct {
+  size_t newHp;
+  size_t totalHp;
+  size_t armor;
+} newHp;
+jmp_buf env;
 #endif //__PVZ__H

@@ -56,7 +56,7 @@ void getBaseAndEnd(void *buf,void *base,void *end) {
 int *getHeapBase() {
   return (int *)getBase("[heap]",0,getBaseAndEnd,&baseInfo.heap_end);
 }
-void changeCoins(int newVal) {
+void changeCoins() {
   char *helper = baseInfo.base + getOffset("coins"),*bp = helper + COINS_HELPER_OFF,*hp = bp;
   char buf[COINS_HELPER_BUFF];
   // baseInfo.base + getOffset("coins") + 0x7aa400;
@@ -69,8 +69,8 @@ void changeCoins(int newVal) {
     }
     hp++;
   }
-  pvz_write(bp + off - 4,&newVal,sizeof(newVal));
-  printf("now set coins to %d\n",newVal);
+  pvz_write(bp + off - 4,&baseInfo.newVal,sizeof(baseInfo.newVal));
+  printf("now set coins to %d\n",baseInfo.newVal);
 }
 void removeColdDown() {
   char *base = baseInfo.base;
@@ -80,48 +80,55 @@ void removeColdDown() {
     p -= 9;
   }
 }
-void letZombiesFragile() {
-  size_t memsz = baseInfo.heap_end - baseInfo.heap_base,maxIndex = memsz - ZOM_HP_OFF;
-  struct {
-    size_t curHp;
-    size_t totalHp;
-    size_t armor;
-  } Hp;
-  struct {
-    size_t newHp;
-    size_t totalHp;
-    size_t armor;
-  } newHp;
-  char *buf = (char *)malloc(memsz),*rp,*orig = buf;
+void createZombiesBuf() {
+  size_t memsz = baseInfo.heap_end - baseInfo.heap_base;
+  baseInfo.zombies_buf_size = memsz;
+  baseInfo.zombies_buf = (char *)malloc(memsz);
+}
+void findAllZombies(void (*op)(void *,void *)) {
+  char *buf = baseInfo.zombies_buf;
+  pvz_read(baseInfo.heap_base,buf,baseInfo.zombies_buf_size);
+  size_t maxIndex = baseInfo.zombies_buf_size - 5;
   int *helper;
-  while(1) {
-    buf = orig;
-    pvz_read(baseInfo.heap_base,buf,memsz);
-    for(size_t i = 0;i < maxIndex;++i) {
-      helper = (int *)buf;
-      if(helper[0] == 0xffffffff &&
-          helper[1] == 0x0 &&
-          helper[2] == 0xffffffff &&
-          helper[3] == 0xffffffff &&
-          helper[4] == 0) {
-        rp = baseInfo.heap_base + i + ZOM_HP_OFF;
-        memcpy(&Hp,buf + ZOM_HP_OFF,sizeof(Hp));
-        if(IN_RANGE(Hp.totalHp,270,6000)) {
-          newHp.newHp = 10;
-          newHp.armor = 0;
-          printf("set %p (%zu %zu,%zu %zu)\n",rp,Hp.curHp,Hp.armor,newHp.newHp,newHp.armor);
-          pvz_write(rp,&newHp,sizeof(newHp));
-        }
-      }
-      ++buf;
+  for(size_t i = 0;i < maxIndex;++i) {
+    helper = (int *)buf;
+    if(helper[0] == 0xffffffff &&
+        helper[1] == 0x0 &&
+        helper[2] == 0xffffffff &&
+        helper[3] == 0xffffffff &&
+        helper[4] == 0) {
+      op(helper,baseInfo.heap_base + i);
     }
-    usleep(200000);
+    ++buf;
   }
-  free(buf);
+}
+void letZombiesFragile(void *dp,void *rp) {
+  memcpy(&Hp,(char *)dp + ZOM_HP_OFF,sizeof(Hp));
+  if(Hp.curHp != 10 && IN_RANGE(Hp.totalHp,270,6000)) {
+    newHp.newHp = 10;
+    newHp.totalHp = Hp.totalHp;
+    newHp.armor = 0;
+    pvz_write((char *)rp + ZOM_HP_OFF,&newHp,sizeof(newHp));
+  }
+}
+void coverZombies(void *dp,void *rp) {
+  baseInfo.newVal = 5000;
+  pvz_write((char *)rp + 0x3c,&baseInfo.newVal,sizeof(baseInfo.newVal));
+}
+void increaseZombies(void *dp,void *rp) {
+  baseInfo.newVal = *((int *)dp + ZOM_HP_OFF / sizeof(int)) * 2;
+  pvz_write((char *)rp + ZOM_HP_OFF,&baseInfo.newVal,sizeof(baseInfo.newVal));
 }
 void increaseCabbageHurler() {
   char *p = baseInfo.base + getOffset("cabbage");
   int v = 45;
   pvz_write(p + 8,&v,sizeof(v));
+}
+void catchSIGINT() {
+  fflush(stdout);
+  longjmp(env,0);
+}
+void registeSigHandle() {
+  signal(SIGINT,catchSIGINT);
 }
 #endif //__CHEATER__H

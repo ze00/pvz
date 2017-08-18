@@ -4,7 +4,7 @@ MODULE := \
 	cheater
 inc := $(shell find inc)
 CC := gcc
-CC_FLAG := -g -Iinc
+CC_FLAG := -g -Iinc -Wall
 all:$(MODULE)
 $(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))
 cheater_lib := scanmem
