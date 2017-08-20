@@ -127,7 +127,7 @@ void increaseCabbageHurler() {
 void findPlants(void (*op)(void *,void *)) {
   char *buf = baseInfo.heap_buf;
   pvz_read(baseInfo.heap_base,buf,baseInfo.heap_buf_size);
-  size_t maxIndex = baseInfo.heap_buf_size - PLAN_STATUS_OFF;
+  size_t maxIndex = baseInfo.heap_buf_size - PLAN_HP_OFF;
   int *helper;
   for(size_t i = 0;i < maxIndex;++i) {
     helper = (int *)buf;
@@ -150,7 +150,7 @@ void increasePlantsAttack(void *dp,void *rp) {
 }
 void catchSIGINT() {
   fflush(stdout);
-  longjmp(env,0);
+  longjmp(env,SETJMP_RET);
 }
 void registeSigHandle() {
   signal(SIGINT,catchSIGINT);

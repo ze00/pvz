@@ -23,7 +23,9 @@ int main(int argc,char **argv) {
   createHeapBuf();
   int option;
   registeSigHandle();
-  setjmp(env);
+  if(setjmp(env) == SETJMP_RET) {
+    puts("");
+  }
   while(1) {
     puts("1.改金币");
     puts("2.僵尸秒杀");

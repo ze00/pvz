@@ -20,6 +20,7 @@
 #define COINS_HELPER_BUFF 256
 #define COINS_HELPER_OFF 0x7aa300
 #define IN_RANGE(obj,min,max) (obj >= min && obj <= max)
+#define SETJMP_RET 0xff
 typedef char BufferType[BUFSIZE];
 typedef char ProcessDIR[PATH_MAX];
 typedef char Path[PATH_MAX];
