@@ -17,7 +17,7 @@ struct {
   char *heap_base;
   char *heap_end;
   char *heap_buf;
-  size_t heap_buf_size;
+  size_t heap_size;
   int newVal;
   pid_t pid;
   ProcessDIR processDIR;

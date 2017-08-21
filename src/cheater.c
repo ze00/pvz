@@ -20,7 +20,7 @@ int main(int argc,char **argv) {
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
   baseInfo.heap_base = (char *)getHeapBase();
-  createHeapBuf();
+  baseInfo.heap_buf = createBuf(baseInfo.heap_end,baseInfo.heap_base,&baseInfo.heap_size);
   int option;
   registeSigHandle();
   if(setjmp(env) == SETJMP_RET) {
@@ -34,9 +34,10 @@ int main(int argc,char **argv) {
     puts("5.黄油糊脸");
     puts("6.僵尸加强二倍");
     puts("7.输出植物地址");
-    puts("8.植物血量增加二倍");
-    puts("9.植物攻速增加二倍");
-    puts("10.退出");
+    puts("8.输出僵尸地址");
+    puts("9.植物血量增加二倍");
+    puts("10.植物攻速增加二倍");
+    puts("11.退出");
     printf("请选择:");
     if(scanf("%d",&option) == EOF) {
       // getchar();
@@ -76,12 +77,15 @@ int main(int argc,char **argv) {
         findPlants(report);
         break;
       case 8:
-        findPlants(increasePlants);
+        findZombies(report);
         break;
       case 9:
-        findPlants(increasePlantsAttack);
+        findPlants(increasePlants);
         break;
       case 10:
+        findPlants(increasePlantsAttack);
+        break;
+      case 11:
         free(baseInfo.heap_buf);
         return 0;
       default:

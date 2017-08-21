@@ -22,6 +22,18 @@ void checkRootState() {
     exit(-1);
   }
 }
+void pvz_write(void *rp,void *buf,size_t len) {
+  if(!sm_write_array(baseInfo.pid,rp,buf,len)) {
+    printf("cannot write memory,'%s' has died?\n",SPECIFIC_PACKAGE);
+    exit(-1);
+  }
+}
+void pvz_read(void *rp,void *buf,size_t len) {
+  if(!sm_read_array(baseInfo.pid,rp,buf,len)) {
+    printf("cannot read memory,'%s' has died?\n",SPECIFIC_PACKAGE);
+    exit(-1);
+  }
+}
 int getBase(const char *spec,int findFirst,void (*action)(void *,void *,void *),void *end) {
   int base;
   Path vmMaps;
@@ -80,15 +92,15 @@ void removeColdDown() {
     p -= 9;
   }
 }
-void createHeapBuf() {
-  size_t memsz = baseInfo.heap_end - baseInfo.heap_base;
-  baseInfo.heap_buf_size = memsz;
-  baseInfo.heap_buf = (char *)malloc(memsz);
+void *createBuf(char *end,char *begin,size_t *size) {
+  size_t memsz = end - begin;
+  *size = memsz;
+  return malloc(memsz);
 }
 void findZombies(void (*op)(void *,void *)) {
   char *buf = baseInfo.heap_buf;
-  pvz_read(baseInfo.heap_base,buf,baseInfo.heap_buf_size);
-  size_t maxIndex = baseInfo.heap_buf_size - ZOM_HP_OFF;
+  pvz_read(baseInfo.heap_base,buf,baseInfo.heap_size);
+  size_t maxIndex = baseInfo.heap_size - ZOM_HP_OFF;
   int *helper;
   for(size_t i = 0;i < maxIndex;++i) {
     helper = (int *)buf;
@@ -126,8 +138,8 @@ void increaseCabbageHurler() {
 }
 void findPlants(void (*op)(void *,void *)) {
   char *buf = baseInfo.heap_buf;
-  pvz_read(baseInfo.heap_base,buf,baseInfo.heap_buf_size);
-  size_t maxIndex = baseInfo.heap_buf_size - PLAN_HP_OFF;
+  pvz_read(baseInfo.heap_base,buf,baseInfo.heap_size);
+  size_t maxIndex = baseInfo.heap_size - PLAN_HP_OFF;
   int *helper;
   for(size_t i = 0;i < maxIndex;++i) {
     helper = (int *)buf;
@@ -138,7 +150,7 @@ void findPlants(void (*op)(void *,void *)) {
   }
 }
 void report(void *__unused __,void *p) {
-  printf("found plant at %p\n",p);
+  printf("found at %p\n",p);
 }
 void increasePlants(void *dp,void *rp) {
   baseInfo.newVal = (*(int*)((char *)dp + PLAN_HP_OFF)) * 2;
