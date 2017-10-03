@@ -14,7 +14,6 @@
 #include <fcntl.h>
 #include <elf.h>
 #include <sys/stat.h>
-#include <sys/sysconf.h>
 #include <sys/mman.h>
 #include "elfutils.h"
 int main(int argc, char **argv) {

@@ -12,12 +12,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <elf.h>
+#include <unistd.h>
 #include <sys/stat.h>
-#include <sys/sysconf.h>
 #include <sys/mman.h>
 size_t padding(size_t size) {
-  unsigned long pagesize = sysconf(_SC_PAGESIZE);
-  return size + (pagesize - (size & pagesize - 1) & pagesize - 1);
+  unsigned long pagesize = getpagesize();
+  return size + (pagesize - ((size & pagesize - 1) & (pagesize - 1)));
 }
 const Elf32_Shdr *getSectionTableHeader(Elf32_Ehdr *hdr) {
   return (Elf32_Shdr *)((const char *)hdr + hdr->e_shstrndx * hdr->e_shentsize +
