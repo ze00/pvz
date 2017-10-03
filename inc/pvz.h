@@ -1,12 +1,12 @@
- /*
-  * File    : pvz.h
-  * Project : PVZ
-  * Author  : ze00
-  * Email   : zerozakiGeek@gmail.com
-  * Date    : 2017-08-15
-  * Module  : 
-  * License : MIT
-  */
+/*
+ * File    : pvz.h
+ * Project : PVZ
+ * Author  : ze00
+ * Email   : zerozakiGeek@gmail.com
+ * Date    : 2017-08-15
+ * Module  :
+ * License : MIT
+ */
 #ifndef __PVZ__H
 #define __PVZ__H
 #include <stdio.h>
@@ -18,9 +18,7 @@
 #include <unistd.h>
 #include <scanmem/scanmem.h>
 #include "base.h"
-int isReadable(Path path) {
-  return access(path,R_OK) == 0;
-}
+int isReadable(Path path) { return access(path, R_OK) == 0; }
 pid_t findPVZProcess(ProcessDIR processDIR) {
   DIR *dp = opendir("/proc");
   FILE *fp;
@@ -28,14 +26,14 @@ pid_t findPVZProcess(ProcessDIR processDIR) {
   pid_t pid = -1;
   Path packageNameProvider;
   BufferType buf;
-  while((dirHandle = readdir(dp))) {
-    if(isdigit(*dirHandle->d_name)) {
-      sprintf(processDIR,"/proc/%s",dirHandle->d_name);
-      sprintf(packageNameProvider,"%s/cmdline",processDIR);
-      if(isReadable(packageNameProvider)) {
-        fp = fopen(packageNameProvider,"r");
-        fgets(buf,BUFSIZE,fp);
-        if(strcmp(buf,SPECIFIC_PACKAGE) == 0) {
+  while ((dirHandle = readdir(dp))) {
+    if (isdigit(*dirHandle->d_name)) {
+      sprintf(processDIR, "/proc/%s", dirHandle->d_name);
+      sprintf(packageNameProvider, "%s/cmdline", processDIR);
+      if (isReadable(packageNameProvider)) {
+        fp = fopen(packageNameProvider, "r");
+        fgets(buf, BUFSIZE, fp);
+        if (strcmp(buf, SPECIFIC_PACKAGE) == 0) {
           pid = atoi(dirHandle->d_name);
           fclose(fp);
           break;

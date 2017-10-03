@@ -1,12 +1,12 @@
- /*
-  * File    : defs.h
-  * Project : PVZ
-  * Author  : ze00
-  * Email   : zerozakiGeek@gmail.com
-  * Date    : 2017-08-17
-  * Module  : 
-  * License : MIT
-  */
+/*
+ * File    : defs.h
+ * Project : PVZ
+ * Author  : ze00
+ * Email   : zerozakiGeek@gmail.com
+ * Date    : 2017-08-17
+ * Module  :
+ * License : MIT
+ */
 #ifndef __DEFS__H
 #define __DEFS__H
 #include <limits.h>
@@ -19,7 +19,7 @@
 #define BUFSIZE 255
 #define COINS_HELPER_BUFF 256
 #define COINS_HELPER_OFF 0x7aa300
-#define IN_RANGE(obj,min,max) (obj >= min && obj <= max)
+#define IN_RANGE(obj, min, max) (obj >= min && obj <= max)
 #define CARDS_PLAN_TPYE_OFF 0x8
 #define SETJMP_RET 0xff
 typedef char BufferType[BUFSIZE];
