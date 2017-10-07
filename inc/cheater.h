@@ -123,8 +123,7 @@ void letZombiesFragile(void *dp, void *rp) {
   }
 }
 void coverZombies(void *dp, void *rp) {
-  baseInfo.newVal = 5000;
-  pvz_write((char *)rp + 0x3c, &baseInfo.newVal, sizeof(baseInfo.newVal));
+  pvz_write((char *)rp + 0x3c, "\x88\x13\x00\x00", sizeof(int));
 }
 void increaseZombies(void *dp, void *rp) {
   baseInfo.newVal = *((int *)dp + ZOM_HP_OFF / sizeof(int)) * 2;

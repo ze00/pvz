@@ -10,13 +10,13 @@
 #ifndef __PVZ__H
 #define __PVZ__H
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include <ctype.h>
 #include <limits.h>
 #include <setjmp.h>
+#include <fcntl.h>
 #include <unistd.h>
-#include <scanmem/scanmem.h>
 #include "base.h"
 int isReadable(Path path) { return access(path, R_OK) == 0; }
 pid_t findPVZProcess(ProcessDIR processDIR) {
