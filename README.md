@@ -18,7 +18,7 @@
   * 获取基址
 ```
   gcc -o elfreader elfreader.c
-  ./elfreader libpvz.so
+  ./elfreader libpvz.so [num]
 ```
   * 使用交互式的游戏修改功能
 ```

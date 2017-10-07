@@ -17,9 +17,15 @@
 #include <sys/mman.h>
 #include "elfutils.h"
 int main(int argc, char **argv) {
-  const char *fn = "libpvz.so";
-  if (argc == 2)
-    fn = argv[1];
+  const char *fn;
+  switch(argc) {
+    case 2:
+      fn = argv[1];
+      break;
+    default:
+      fprintf(stderr,"./patcher [dynamic library]\n");
+      exit(-1);
+  }
   int fd = open(fn, O_RDWR);
   size_t memsz;
   char *rawHandle = getRawHandle(fd, &memsz);

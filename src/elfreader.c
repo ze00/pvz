@@ -17,13 +17,17 @@
 #include <sys/mman.h>
 #include "elfutils.h"
 int main(int argc, char **argv) {
-  const char *fn = "libpvz.so";
+  const char *fn = NULL;
   int num = -1;
   switch (argc) {
   case 3:
     num = atoi(argv[2]);
   case 2:
     fn = argv[1];
+    break;
+  default:
+    fprintf(stderr,"./elfreader [file] [num]\n");
+    exit(-1);
   }
   int fd = open(fn, O_RDWR);
   size_t memsz;
