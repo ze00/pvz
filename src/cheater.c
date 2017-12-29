@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <scanmem/scanmem.h>
 #include <setjmp.h>
 #include "pvz.h"
 #include "pvz_offset.h"

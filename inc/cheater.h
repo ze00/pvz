@@ -12,10 +12,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <scanmem/scanmem.h>
 #include "pvz.h"
 #include "pvz_offset.h"
 #include "base.h"
+#include "scanmem.h"
 void checkRootState() {
   if (getuid() != 0 || getgid() != 0) {
     printf("must run me under root mode\n");
