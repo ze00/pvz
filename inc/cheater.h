@@ -178,13 +178,11 @@ void increasePlantsAttack(void *dp, void *rp) {
 }
 void putLadder(void *local,void *remote) {
   int type = *(int *)(local + getOffset("zombies_type"));
-  printf("%p %d\n",remote,type);
-/*  if(type == 21) {
-    float f = 400;
+  if(type == 21) {
+    float f = baseInfo.newVal * 100;
     pvz_write(remote + getOffset("zombies_pos_x"),&f,sizeof(f));
     pvz_write(remote + getOffset("zombies_pos_y"),&f,sizeof(f));
   }
-  */
 }
 void catchSIGINT() {
   fflush(stdout);

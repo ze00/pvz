@@ -42,22 +42,17 @@ int main(int argc, char **argv) {
     puts("10.植物攻速增加二倍");
     puts("11.搭梯");
     puts("12.退出");
-    printf("请选择:");
-    if (scanf("%d", &option) == EOF) {
-      getchar();
-      setbuf(stdin, NULL);
-      printf("无效输入\n");
-      continue;
+#define GETOPT(mess,opt) printf(mess);\
+    if (scanf("%d", &opt) != 1) {\
+      setbuf(stdin, NULL);\
+      printf("无效输入\n");\
+      raise(SIGINT); \
     }
+    GETOPT("请输入:",option);
     switch (option) {
     case 1:
-      printf("更改为?");
-      if (scanf("%d", &baseInfo.newVal) != EOF) {
-        changeCoins();
-      } else {
-        getchar();
-        printf("输入错误...\n");
-      }
+      GETOPT("更改为?",baseInfo.newVal);
+      changeCoins();
       break;
     case 2:
       while (1) {
@@ -90,6 +85,7 @@ int main(int argc, char **argv) {
       findPlants(increasePlantsAttack);
       break;
     case 11:
+      GETOPT("要将梯子僵尸放于何列?",baseInfo.newVal);
       findZombies(putLadder);
       break;
     case 12:
