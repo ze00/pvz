@@ -24,19 +24,19 @@ void checkRootState() {
 }
 void pvz_write(void *rp, void *buf, size_t len) {
   if (!sm_write_array(baseInfo.pid, rp, buf, len)) {
-    printf("cannot write memory,'%s' has died?\n", SPECIFIC_PACKAGE);
+    printf("cannot write memory at %p,'%s' has died?\n", rp,SPECIFIC_PACKAGE);
     exit(-1);
   }
 }
 void pvz_read(void *rp, void *buf, size_t len) {
   if (!sm_read_array(baseInfo.pid, rp, buf, len)) {
-    printf("cannot read memory,'%s' has died?\n", SPECIFIC_PACKAGE);
+    printf("cannot read memory at %p,'%s' has died?\n", rp,SPECIFIC_PACKAGE);
     exit(-1);
   }
 }
 int getBase(const char *spec, int findFirst,
             void (*action)(void *, void *, void *), void *end) {
-  int base;
+  unsigned int base;
   Path vmMaps;
   sprintf(vmMaps, "%s/maps", baseInfo.processDIR);
   FILE *maps = fopen(vmMaps, "r");
@@ -64,11 +64,27 @@ int *getDynamicBase() {
   return (int *)getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, NULL);
 }
 void getBaseAndEnd(void *buf, void *base, void *end) {
-  sscanf((char *)buf, "%8x-%8x", (int *)base, (int *)end);
+  sscanf(buf, "%8x-%8x", (int *)base, (int *)end);
+}
+void getNoughtBaseAndEnd(void *buf, void __unused *base, void __unused *end) {
+  int f,g;
+  sscanf(buf, "%8x-%8x", &f, &g);
+  // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
+  // 不知道为什么这条代码会出问题
+  if(g - f == 0x300000) {
+    baseInfo.heap_base = (void *)f;
+    baseInfo.heap_end = (void *)g;
+  }
 }
 int *getHeapBase() {
+#ifdef NOUGHT
+  getBase("[anon:libc_malloc]", 0, getNoughtBaseAndEnd, &baseInfo.heap_end);
+  return (int *)baseInfo.heap_base;
+#else
   return (int *)getBase("[heap]", 0, getBaseAndEnd, &baseInfo.heap_end);
+#endif
 }
+
 void changeCoins() {
   char *helper = baseInfo.base + getOffset("coins"),
        *bp = helper + COINS_HELPER_OFF, *hp = bp;
@@ -83,6 +99,7 @@ void changeCoins() {
     }
     hp++;
   }
+  printf("%p\n",bp + off - 4);
   pvz_write(bp + off - 4, &baseInfo.newVal, sizeof(baseInfo.newVal));
   printf("now set coins to %d\n", baseInfo.newVal);
 }
@@ -158,6 +175,16 @@ void increasePlantsAttack(void *dp, void *rp) {
   baseInfo.newVal = (*(int *)((char *)dp + PLAN_ATT_TOTAL_OFF)) / 2;
   pvz_write((char *)rp + PLAN_ATT_TOTAL_OFF, &baseInfo.newVal,
             sizeof(baseInfo.newVal));
+}
+void putLadder(void *local,void *remote) {
+  int type = *(int *)(local + getOffset("zombies_type"));
+  printf("%p %d\n",remote,type);
+/*  if(type == 21) {
+    float f = 400;
+    pvz_write(remote + getOffset("zombies_pos_x"),&f,sizeof(f));
+    pvz_write(remote + getOffset("zombies_pos_y"),&f,sizeof(f));
+  }
+  */
 }
 void catchSIGINT() {
   fflush(stdout);

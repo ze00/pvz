@@ -9,6 +9,7 @@ NDK ?= $(HOME)/android-ndk-r14b
 NDK_SYSROOT ?= $(NDK)/platforms/android-24/arch-arm
 CC := $(NDK_TOOCHAIN)-gcc
 CC_FLAG := -static -g -Iinc -Wall -std=c99 --sysroot=$(NDK_SYSROOT)
+CC_FLAG += -DHAVE_PROCMEM -DDEBUG -DNOUGHT
 all:$(MODULE)
 $(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))
 cheater_src += ptrace.c

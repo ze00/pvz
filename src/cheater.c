@@ -19,6 +19,9 @@ int main(int argc, char **argv) {
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
   baseInfo.heap_base = (char *)getHeapBase();
+#ifdef DEBUG
+  printf("Dynamic base %p,heap base %p\n",baseInfo.base, baseInfo.heap_base);
+#endif
   baseInfo.heap_buf =
       createBuf(baseInfo.heap_end, baseInfo.heap_base, &baseInfo.heap_size);
   int option;
@@ -37,10 +40,11 @@ int main(int argc, char **argv) {
     puts("8.输出僵尸地址");
     puts("9.植物血量增加二倍");
     puts("10.植物攻速增加二倍");
-    puts("11.退出");
+    puts("11.搭梯");
+    puts("12.退出");
     printf("请选择:");
     if (scanf("%d", &option) == EOF) {
-      // getchar();
+      getchar();
       setbuf(stdin, NULL);
       printf("无效输入\n");
       continue;
@@ -86,6 +90,9 @@ int main(int argc, char **argv) {
       findPlants(increasePlantsAttack);
       break;
     case 11:
+      findZombies(putLadder);
+      break;
+    case 12:
       free(baseInfo.heap_buf);
       return 0;
     default:

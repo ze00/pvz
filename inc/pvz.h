@@ -42,6 +42,9 @@ pid_t findPVZProcess(ProcessDIR processDIR) {
       }
     }
   }
+#ifdef DEBUG
+  printf("found %s:%d\n",SPECIFIC_PACKAGE, pid);
+#endif
   closedir(dp);
   return pid;
 }

@@ -22,4 +22,10 @@ struct {
   pid_t pid;
   ProcessDIR processDIR;
 } baseInfo;
+void initBase() {
+  baseInfo.base = NULL;
+  baseInfo.heap_base = NULL;
+  baseInfo.heap_end = NULL;
+  baseInfo.heap_buf = NULL;
+}
 #endif //__BASE__H
