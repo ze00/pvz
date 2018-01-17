@@ -1,6 +1,6 @@
 # PVZ小工具
   * 本人仅在6.0.1与7.11的Android系统上测试过北美版的pvz
-    [pvz](doc/pvz.png)
+    ![pvz](doc/pvz.png)
   * 需要Root权限
 ## 使用步骤
   * 安装termux
@@ -14,5 +14,5 @@
     在termux内输入:
     su
     ./cheater
-    [cheater](doc/cheater.png)
+    ![cheater](doc/cheater.png)
 REF:https://github.com/scanmem/scanmem
