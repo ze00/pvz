@@ -24,13 +24,13 @@ void checkRootState() {
 }
 void pvz_write(void *rp, void *buf, size_t len) {
   if (!sm_write_array(baseInfo.pid, rp, buf, len)) {
-    printf("cannot write memory at %p,'%s' has died?\n", rp,SPECIFIC_PACKAGE);
+    printf("cannot write memory at %p,'%s' has died?\n", rp, SPECIFIC_PACKAGE);
     exit(-1);
   }
 }
 void pvz_read(void *rp, void *buf, size_t len) {
   if (!sm_read_array(baseInfo.pid, rp, buf, len)) {
-    printf("cannot read memory at %p,'%s' has died?\n", rp,SPECIFIC_PACKAGE);
+    printf("cannot read memory at %p,'%s' has died?\n", rp, SPECIFIC_PACKAGE);
     exit(-1);
   }
 }
@@ -67,11 +67,11 @@ void getBaseAndEnd(void *buf, void *base, void *end) {
   sscanf(buf, "%8x-%8x", (int *)base, (int *)end);
 }
 void getNoughtBaseAndEnd(void *buf, void __unused *base, void __unused *end) {
-  int f,g;
+  int f, g;
   sscanf(buf, "%8x-%8x", &f, &g);
   // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
   // 不知道为什么这条代码会出问题
-  if(g - f == 0x300000) {
+  if (g - f == 0x300000) {
     baseInfo.heap_base = (void *)f;
     baseInfo.heap_end = (void *)g;
   }
@@ -99,7 +99,7 @@ void changeCoins() {
     }
     hp++;
   }
-  printf("%p\n",bp + off - 4);
+  printf("%p\n", bp + off - 4);
   pvz_write(bp + off - 4, &baseInfo.newVal, sizeof(baseInfo.newVal));
   printf("now set coins to %d\n", baseInfo.newVal);
 }
@@ -176,16 +176,29 @@ void increasePlantsAttack(void *dp, void *rp) {
   pvz_write((char *)rp + PLAN_ATT_TOTAL_OFF, &baseInfo.newVal,
             sizeof(baseInfo.newVal));
 }
-void putLadder(void *local,void *remote) {
-  int type = *(int *)(local + getOffset("zombies_type"));
-  if(type == 21) {
-    float f = baseInfo.newVal * 100;
-    pvz_write(remote + getOffset("zombies_pos_x"),&f,sizeof(f));
-    pvz_write(remote + getOffset("zombies_pos_y"),&f,sizeof(f));
+void putLadder(void *local, void *remote) {
+  if (baseInfo.task != NULL) {
+    int type = *(int *)(local + getOffset("zombies_type"));
+    if (type == 21) {
+      float f = baseInfo.task->col * 100, of;
+      int row = baseInfo.task->row - 1;
+      pvz_read(remote + getOffset("zombies_pos_x"), &of, sizeof(of));
+      if (f > of)
+        return;
+      pvz_write(remote + getOffset("zombies_row"), &row, sizeof(row));
+      pvz_write(remote + getOffset("zombies_pos_x"), &f, sizeof(f));
+      pvz_write(remote + getOffset("zombies_pos_y"), &f, sizeof(f));
+      baseInfo.task_helper = baseInfo.task->next;
+      free(baseInfo.task);
+      baseInfo.task = baseInfo.task_helper;
+    }
   }
 }
 void catchSIGINT() {
   fflush(stdout);
+  setbuf(stdin, NULL);
+  destroy(&baseInfo.task);
+  baseInfo.task_helper = NULL;
   longjmp(env, SETJMP_RET);
 }
 void registeSigHandle() { signal(SIGINT, catchSIGINT); }

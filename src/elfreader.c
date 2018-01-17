@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     fn = argv[1];
     break;
   default:
-    fprintf(stderr,"./elfreader [file] [num]\n");
+    fprintf(stderr, "./elfreader [file] [num]\n");
     exit(-1);
   }
   int fd = open(fn, O_RDWR);

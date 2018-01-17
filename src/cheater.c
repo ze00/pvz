@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <setjmp.h>
+#include <ctype.h>
+#include "defs.h"
+#include "base.h"
 #include "pvz.h"
 #include "pvz_offset.h"
 #include "cheater.h"
@@ -20,7 +23,7 @@ int main(int argc, char **argv) {
   baseInfo.base = (char *)base;
   baseInfo.heap_base = (char *)getHeapBase();
 #ifdef DEBUG
-  printf("Dynamic base %p,heap base %p\n",baseInfo.base, baseInfo.heap_base);
+  printf("Dynamic base %p,heap base %p\n", baseInfo.base, baseInfo.heap_base);
 #endif
   baseInfo.heap_buf =
       createBuf(baseInfo.heap_end, baseInfo.heap_base, &baseInfo.heap_size);
@@ -42,16 +45,22 @@ int main(int argc, char **argv) {
     puts("10.植物攻速增加二倍");
     puts("11.搭梯");
     puts("12.退出");
-#define GETOPT(mess,opt) printf(mess);\
-    if (scanf("%d", &opt) != 1) {\
-      setbuf(stdin, NULL);\
-      printf("无效输入\n");\
-      raise(SIGINT); \
-    }
-    GETOPT("请输入:",option);
+#define PANIC                                                                  \
+  do {                                                                         \
+    setbuf(stdin, NULL);                                                       \
+    printf("无效输入\n");                                                      \
+    raise(SIGINT);                                                             \
+  } while (0)
+
+#define GETOPT(mess, opt)                                                      \
+  printf(mess);                                                                \
+  if (scanf("%d", &opt) != 1) {                                                \
+    PANIC;                                                                     \
+  }
+    GETOPT("请输入:", option);
     switch (option) {
     case 1:
-      GETOPT("更改为?",baseInfo.newVal);
+      GETOPT("更改为?", baseInfo.newVal);
       changeCoins();
       break;
     case 2:
@@ -84,10 +93,65 @@ int main(int argc, char **argv) {
     case 10:
       findPlants(increasePlantsAttack);
       break;
-    case 11:
-      GETOPT("要将梯子僵尸放于何列?",baseInfo.newVal);
-      findZombies(putLadder);
-      break;
+    case 11: {
+      BufferType buf;
+      const char *val = buf;
+      int row, col;
+      enum statusMachine {
+        NEED_DOT,
+        NEED_COMMA,
+        NEED_ROW,
+        NEED_COL,
+      } status = NEED_ROW;
+      printf("要将梯子僵尸放于何列?\n例如:1.2,1.3,(行与列以英文句号分隔)");
+      setbuf(stdin, NULL);
+      if (fgets(buf, sizeof(buf), stdin) == NULL)
+        PANIC;
+    parse:
+#define CHECK(stmt)                                                            \
+  if (!(stmt))                                                                 \
+    goto panic;
+#define DIGIT() (*val - '0')
+      if (*val == '\n')
+        goto putladder;
+      while (isspace(*val))
+        ++val;
+      switch (status) {
+      case NEED_ROW:
+        CHECK(isdigit(*val) && IN_RANGE(DIGIT(), 1, 6));
+        row = DIGIT();
+        status = NEED_DOT;
+        val++;
+        goto parse;
+      case NEED_COL:
+        CHECK(isdigit(*val) && IN_RANGE(DIGIT(), 1, 9));
+        col = DIGIT();
+        status = NEED_COMMA;
+        val++;
+        insert(&baseInfo.task_helper, row, col);
+        if (baseInfo.task == NULL)
+          baseInfo.task = baseInfo.task_helper;
+        baseInfo.task_helper = baseInfo.task_helper->next;
+        goto parse;
+      case NEED_DOT:
+        CHECK('.' == *val);
+        status = NEED_COL;
+        val++;
+        goto parse;
+      case NEED_COMMA:
+        CHECK(',' == *val);
+        status = NEED_ROW;
+        val++;
+        goto parse;
+      }
+    panic:
+      PANIC;
+    putladder:
+      while (baseInfo.task != NULL) {
+        findZombies(putLadder);
+        usleep(500000);
+      }
+    } break;
     case 12:
       free(baseInfo.heap_buf);
       return 0;

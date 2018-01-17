@@ -18,13 +18,13 @@
 #include "elfutils.h"
 int main(int argc, char **argv) {
   const char *fn;
-  switch(argc) {
-    case 2:
-      fn = argv[1];
-      break;
-    default:
-      fprintf(stderr,"./patcher [dynamic library]\n");
-      exit(-1);
+  switch (argc) {
+  case 2:
+    fn = argv[1];
+    break;
+  default:
+    fprintf(stderr, "./patcher [dynamic library]\n");
+    exit(-1);
   }
   int fd = open(fn, O_RDWR);
   size_t memsz;
