@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
     puts("12.退出");
 #define PANIC                                                                  \
   do {                                                                         \
-    setbuf(stdin, NULL);                                                       \
     printf("无效输入\n");                                                      \
     raise(SIGINT);                                                             \
   } while (0)
@@ -103,17 +102,26 @@ int main(int argc, char **argv) {
         NEED_ROW,
         NEED_COL,
       } status = NEED_ROW;
-      printf("要将梯子僵尸放于何列?\n例如:1.2,1.3,(行与列以英文句号分隔)");
+      printf("要将梯子僵尸放于何列?\n例如:1.2,1.3,(行与列以英文句号分隔,"
+             "多个行列以英文逗号分隔)");
       setbuf(stdin, NULL);
       if (fgets(buf, sizeof(buf), stdin) == NULL)
         PANIC;
     parse:
 #define CHECK(stmt)                                                            \
-  if (!(stmt))                                                                 \
-    goto panic;
+  if (!(stmt)) {                                                               \
+    printf("%s", buf);                                                         \
+    printf("%*s\n", val - buf + 1, "^");                                       \
+    goto panic;                                                                \
+  }
 #define DIGIT() (*val - '0')
-      if (*val == '\n')
+      if (*val == '\n') {
+        if (status != NEED_COMMA) {
+          --val;
+          CHECK(false);
+        }
         goto putladder;
+      }
       while (isspace(*val))
         ++val;
       switch (status) {
