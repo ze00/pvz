@@ -22,6 +22,14 @@ all:$(MODULE)
 $(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))
 cheater_src += ptrace.c
 $(foreach m,$(MODULE),$(eval TARGET := $(m))$(eval DEP := $($(m)_src) $(inc))$(eval include build/reg_rule.mk))
+.PHONY:release
+release:
+	make NDK_BUILD=true NOUGHT=true
+	cp cheater release/cheater_nought
+	make clean
+	make NDK_BUILD=true
+	cp cheater release/cheater_marshmallow
+	make clean
 .PHONY:clean
 clean:
 	-@ rm -rf $(MODULE)
