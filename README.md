@@ -1,29 +1,18 @@
 # PVZ小工具
-  * 准备工作
-
-```
-  make
-  unzip com.popcap.pvz_na.apk lib/armeabi/libpvz.so
-```
-  * 打包(##签名工作请自行完成##)
-```
-  zip -ur com.popcap.pvz_na.apk lib
-```
-
-  * 将植物的冷却时间以及单价都置0
-```
-  gcc -o patcher patcher.c
-  ./patcher libpvz.so
-```
-  * 获取基址
-```
-  gcc -o elfreader elfreader.c
-  ./elfreader libpvz.so [num]
-```
-  * 使用交互式的游戏修改功能
-```
-  gcc -o cheater cheater.c
-  su
-  ./cheater
-```
+  * 本人仅在6.0.1与7.11的Android系统上测试过北美版的pvz
+    [pvz](doc/pvz.png)
+  * 需要Root权限
+## 使用步骤
+  * 安装termux
+    https://www.coolapk.com/apk/com.termux
+    安装完之后将会下载几mb的东西，安装即可
+  * 获取修改器程序
+    打开termux
+    然后输入:
+    curl https://raw.githubusercontent.com/ze00/pvz/master/install.sh | sh
+  * 运行修改器程序
+    在termux内输入:
+    su
+    ./cheater
+    [cheater](doc/cheater.png)
 REF:https://github.com/scanmem/scanmem

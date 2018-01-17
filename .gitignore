@@ -3,3 +3,4 @@ patcher
 elfreader
 *.gch
 lib
+!release/*
