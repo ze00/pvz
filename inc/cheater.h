@@ -105,7 +105,7 @@ void changeCoins() {
 }
 void removeColdDown() {
   char *base = baseInfo.base;
-  int *p = (int *)(base + getOffset("cannon")), val;
+  int *p = (int *)(base + getOffset("cannon")), val = 0;
   for (int i = 0; i < 48; ++i) {
     pvz_write(p, &val, sizeof(val));
     p -= 9;
@@ -177,6 +177,7 @@ void increasePlantsAttack(void *dp, void *rp) {
             sizeof(baseInfo.newVal));
 }
 void putLadder(void *local, void *remote) {
+
   if (baseInfo.task != NULL) {
     int type = *(int *)(local + getOffset("zombies_type"));
     if (type == 21) {
