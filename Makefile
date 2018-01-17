@@ -4,7 +4,7 @@ MODULE := \
 	cheater
 inc := $(shell find inc)
 CC_FLAG := -g -Iinc -Wall -std=c99
-CC_FLAG += -DHAVE_PROCMEM -DNOUGHT -DDEBUG
+CC_FLAG += -DHAVE_PROCMEM -DDEBUG
 ifeq ($(NDK_BUILD),true)
 	NDK_STANDALONE ?= $(HOME)/ndk/arm
 	NDK_TOOCHAIN ?= $(NDK_STANDALONE)/bin/arm-linux-androideabi
@@ -14,6 +14,9 @@ ifeq ($(NDK_BUILD),true)
 	CC_FLAG += -static --sysroot=$(NDK_SYSROOT)
 else
 	CC := gcc
+endif
+ifeq ($(NOUGHT),true)
+ CC_FLAG += -DNOUGHT
 endif
 all:$(MODULE)
 $(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))

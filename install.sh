@@ -1,3 +1,8 @@
 #!/system/bin/sh
-wget 'https://raw.githubusercontent.com/ze00/pvz/master/release/cheater'
+version=$(getprop ro.build.version.release)
+if [ "${version%.*}" -gt 6 ];
+  wget 'https://raw.githubusercontent.com/ze00/pvz/master/release/cheater_nought' -O cheater
+else
+  wget 'https://raw.githubusercontent.com/ze00/pvz/master/release/cheater_marshmallow' -O cheater
+fi
 chmod a+x cheater
