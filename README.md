@@ -9,10 +9,14 @@
   * 获取修改器程序
     打开termux
     然后输入:
+    ```
     curl https://raw.githubusercontent.com/ze00/pvz/master/install.sh | sh
+    ```
   * 运行修改器程序
     在termux内输入:
+    ```
     su
     ./cheater
+    ```
     ![cheater](doc/cheater.png)
 REF:https://github.com/scanmem/scanmem
