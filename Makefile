@@ -6,14 +6,23 @@ inc := $(shell find inc)
 CC_FLAG := -g -Iinc -Wall -std=c99
 CC_FLAG += -DHAVE_PROCMEM -DDEBUG
 ifeq ($(NDK_BUILD),true)
+  ifeq ($(ARM64),true)
+	NDK_STANDALONE ?= $(HOME)/ndk/arm64
+	NDK_TOOCHAIN ?= $(NDK_STANDALONE)/bin/aarch64-linux-android
+	NDK ?= $(HOME)/android-ndk-r14b
+	NDK_SYSROOT ?= $(NDK)/platforms/android-24/arch-arm64
+  else
 	NDK_STANDALONE ?= $(HOME)/ndk/arm
 	NDK_TOOCHAIN ?= $(NDK_STANDALONE)/bin/arm-linux-androideabi
 	NDK ?= $(HOME)/android-ndk-r14b
 	NDK_SYSROOT ?= $(NDK)/platforms/android-24/arch-arm
+  endif
 	CC := $(NDK_TOOCHAIN)-gcc
-	CC_FLAG += -static --sysroot=$(NDK_SYSROOT)
+	STRIP := $(NDK_TOOCHAIN)-strip
+	CC_FLAG += --sysroot=$(NDK_SYSROOT)
 else
 	CC := gcc
+	STRIP := strip
 endif
 ifeq ($(NOUGHT),true)
  CC_FLAG += -DNOUGHT
@@ -25,10 +34,16 @@ $(foreach m,$(MODULE),$(eval TARGET := $(m))$(eval DEP := $($(m)_src) $(inc))$(e
 .PHONY:release
 release:
 	make NDK_BUILD=true NOUGHT=true
-	cp cheater release/cheater_nought
+	cp cheater release/arm/cheater_nought
 	make clean
 	make NDK_BUILD=true
-	cp cheater release/cheater_marshmallow
+	cp cheater release/arm/cheater_marshmallow
+	make clean
+	make NDK_BUILD=true NOUGHT=true ARM64=true
+	cp cheater release/arm64/cheater_nought
+	make clean
+	make NDK_BUILD=true ARM64=true
+	cp cheater release/arm64/cheater_marshmallow
 	make clean
 .PHONY:clean
 clean:
