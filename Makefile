@@ -19,7 +19,7 @@ ifeq ($(NDK_BUILD),true)
   endif
 	CC := $(NDK_TOOCHAIN)-gcc
 	STRIP := $(NDK_TOOCHAIN)-strip
-	CC_FLAG += --sysroot=$(NDK_SYSROOT)
+	CC_FLAG += -fPIC -pie --sysroot=$(NDK_SYSROOT)
 else
 	CC := gcc
 	STRIP := strip
