@@ -6,15 +6,14 @@ inc := $(shell find inc)
 CC_FLAG := -g -Iinc -Wall -std=c99
 CC_FLAG += -DHAVE_PROCMEM -DDEBUG
 ifeq ($(NDK_BUILD),true)
+  NDK ?= $(HOME)/android-ndk-r14b
   ifeq ($(ARM64),true)
 	NDK_STANDALONE ?= $(HOME)/ndk/arm64
 	NDK_TOOCHAIN ?= $(NDK_STANDALONE)/bin/aarch64-linux-android
-	NDK ?= $(HOME)/android-ndk-r14b
 	NDK_SYSROOT ?= $(NDK)/platforms/android-24/arch-arm64
   else
 	NDK_STANDALONE ?= $(HOME)/ndk/arm
 	NDK_TOOCHAIN ?= $(NDK_STANDALONE)/bin/arm-linux-androideabi
-	NDK ?= $(HOME)/android-ndk-r14b
 	NDK_SYSROOT ?= $(NDK)/platforms/android-24/arch-arm
   endif
 	CC := $(NDK_TOOCHAIN)-gcc
