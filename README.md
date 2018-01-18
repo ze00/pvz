@@ -19,4 +19,9 @@
     ./cheater
     ```
     ![cheater](doc/cheater.png)
+## 如何获取更新的修改器程序
+  * 很简单，只需要在termux下执行:
+  ```
+  curl https://raw.githubusercontent.com/ze00/pvz/master/install.sh | sh
+  ```
 REF:https://github.com/scanmem/scanmem
