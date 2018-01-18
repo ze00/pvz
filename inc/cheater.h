@@ -189,6 +189,7 @@ void putLadder(void *local, void *remote) {
       pvz_write(remote + getOffset("zombies_row"), &row, sizeof(row));
       pvz_write(remote + getOffset("zombies_pos_x"), &f, sizeof(f));
       pvz_write(remote + getOffset("zombies_pos_y"), &f, sizeof(f));
+      printf("put ladder on %d:%d\n", baseInfo.task->row, baseInfo.task->col);
       baseInfo.task_helper = baseInfo.task->next;
       free(baseInfo.task);
       baseInfo.task = baseInfo.task_helper;

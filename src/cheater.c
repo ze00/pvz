@@ -136,14 +136,14 @@ int main(int argc, char **argv) {
         col = DIGIT();
         status = NEED_COMMA;
         val++;
-        if(col != 1) {
+        if (col != 1) {
           insert(&baseInfo.task_helper, row, col);
           if (baseInfo.task == NULL)
             baseInfo.task = baseInfo.task_helper;
           else
             baseInfo.task_helper = baseInfo.task_helper->next;
         } else {
-          printf("WARNING:忽略%d:%d\n",row,col);
+          printf("WARNING:忽略%d.%d\n", row, col);
         }
         goto parse;
       case NEED_DOT:
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
     putladder:
       while (baseInfo.task != NULL) {
         findZombies(putLadder);
-        usleep(500000);
+        usleep(250000);
       }
     } break;
     case 12:
