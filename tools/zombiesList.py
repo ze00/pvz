@@ -1,8 +1,8 @@
-#!env python
+#!/data/data/com.termux/files/usr/bin/python
 #-*- coding: utf-8 -*-
 """
-File    : a.py
-Project :
+File    : zombiesList.py
+Project : PVZ
 Author  : ze00
 Email   : zerozakiGeek@gmail.com
 Date    : 2018-01-18
