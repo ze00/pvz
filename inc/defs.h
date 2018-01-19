@@ -24,6 +24,7 @@
 #define SETJMP_RET 0xff
 #define INTP(p) ((int *)(p))
 #define PUMPKIN_CODE (30)
+#define LILYPAD_CODE (16)
 typedef char BufferType[BUFSIZE];
 typedef char ProcessDIR[PATH_MAX];
 typedef char Path[PATH_MAX];

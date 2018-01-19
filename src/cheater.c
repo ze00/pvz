@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
     puts("9.植物血量增加二倍");
     puts("10.植物攻速增加二倍");
     puts("11.搭梯");
-    puts("12.退出");
+    puts("12.炸荷叶烂南瓜");
+    puts("13.退出");
 #define PANIC                                                                  \
   do {                                                                         \
     printf("无效输入\n");                                                      \
@@ -165,7 +166,9 @@ int main(int argc, char **argv) {
         usleep(250000);
       }
     } break;
-    case 12:
+    case 12: {
+    } break;
+    case 13:
       free(baseInfo.heap_buf);
       return 0;
     default:
