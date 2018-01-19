@@ -22,6 +22,8 @@
 #define IN_RANGE(obj, min, max) (obj >= min && obj <= max)
 #define CARDS_PLAN_TPYE_OFF 0x8
 #define SETJMP_RET 0xff
+#define INTP(p) ((int *)(p))
+#define PUMPKIN_CODE (30)
 typedef char BufferType[BUFSIZE];
 typedef char ProcessDIR[PATH_MAX];
 typedef char Path[PATH_MAX];

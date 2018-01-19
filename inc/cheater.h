@@ -100,8 +100,8 @@ void changeCoins() {
     hp++;
   }
   printf("%p\n", bp + off - 4);
-  pvz_write(bp + off - 4, &baseInfo.newVal, sizeof(baseInfo.newVal));
-  printf("now set coins to %d\n", baseInfo.newVal);
+  pvz_write(bp + off - 4, &baseInfo.val, sizeof(baseInfo.val));
+  printf("now set coins to %d\n", baseInfo.val);
 }
 void removeColdDown() {
   char *base = baseInfo.base;
@@ -143,10 +143,10 @@ void coverZombies(void *dp, void *rp) {
   pvz_write((char *)rp + 0x3c, "\x88\x13\x00\x00", sizeof(int));
 }
 void increaseZombies(void *dp, void *rp) {
-  baseInfo.newVal = *((int *)dp + ZOM_HP_OFF / sizeof(int)) * 2;
-  pvz_write((char *)rp + ZOM_HP_OFF, &baseInfo.newVal, sizeof(baseInfo.newVal));
+  baseInfo.val = *((int *)dp + ZOM_HP_OFF / sizeof(int)) * 2;
+  pvz_write((char *)rp + ZOM_HP_OFF, &baseInfo.val, sizeof(baseInfo.val));
 }
-void increaseCabbageHurler() {
+void increaseCabbagePult() {
   char *p = baseInfo.base + getOffset("cabbage");
   int v = 45;
   pvz_write(p + 8, &v, sizeof(v));
@@ -158,7 +158,7 @@ void findPlants(void (*op)(void *, void *)) {
   int *helper;
   for (size_t i = 0; i < maxIndex; ++i) {
     helper = (int *)buf;
-    if (helper[0] == 0x43200000 && helper[1] == 0x42200000 &&
+    if (helper[0] == 0x43200000 && helper[1] == 0x42200000 && helper[2] == 1 &&
         IN_RANGE(helper[PLAN_HP_OFF / sizeof(int)], 300, 8000)) {
       op(helper, baseInfo.heap_base + i);
     }
@@ -166,15 +166,20 @@ void findPlants(void (*op)(void *, void *)) {
   }
 }
 void report(void *__unused __, void *p) { printf("found at %p\n", p); }
+void reportPlants(void *plant, void *rp) {
+  printf("found at %p (row@%d x col@%d)(hp:%d code:%d)\n", rp,
+         *INTP(plant + getOffset("plants_row")),
+         *INTP(plant + getOffset("plants_col")), *INTP(plant + PLAN_HP_OFF),
+         *INTP(plant + getOffset("plants_type")));
+}
 void increasePlants(void *dp, void *rp) {
-  baseInfo.newVal = (*(int *)((char *)dp + PLAN_HP_OFF)) * 2;
-  pvz_write((char *)rp + PLAN_HP_OFF, &baseInfo.newVal,
-            sizeof(baseInfo.newVal));
+  baseInfo.val = (*(int *)((char *)dp + PLAN_HP_OFF)) * 2;
+  pvz_write((char *)rp + PLAN_HP_OFF, &baseInfo.val, sizeof(baseInfo.val));
 }
 void increasePlantsAttack(void *dp, void *rp) {
-  baseInfo.newVal = (*(int *)((char *)dp + PLAN_ATT_TOTAL_OFF)) / 2;
-  pvz_write((char *)rp + PLAN_ATT_TOTAL_OFF, &baseInfo.newVal,
-            sizeof(baseInfo.newVal));
+  baseInfo.val = (*(int *)((char *)dp + PLAN_ATT_TOTAL_OFF)) / 2;
+  pvz_write((char *)rp + PLAN_ATT_TOTAL_OFF, &baseInfo.val,
+            sizeof(baseInfo.val));
 }
 void putLadder(void *local, void *remote) {
 

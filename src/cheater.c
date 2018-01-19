@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     GETOPT("请输入:", option);
     switch (option) {
     case 1:
-      GETOPT("更改为?", baseInfo.newVal);
+      GETOPT("更改为?", baseInfo.val);
       changeCoins();
       break;
     case 2:
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
       }
       break;
     case 3:
-      increaseCabbageHurler();
+      increaseCabbagePult();
       break;
     case 4:
       removeColdDown();
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
       findZombies(increaseZombies);
       break;
     case 7:
-      findPlants(report);
+      findPlants(reportPlants);
       break;
     case 8:
       findZombies(report);

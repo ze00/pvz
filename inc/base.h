@@ -24,7 +24,7 @@ struct {
   char *heap_end;
   char *heap_buf;
   size_t heap_size;
-  int newVal;
+  int val;
   pid_t pid;
   ProcessDIR processDIR;
   ladder_task *task;
