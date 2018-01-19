@@ -168,8 +168,8 @@ void findPlants(void (*op)(void *, void *)) {
 void report(void *__unused __, void *p) { printf("found at %p\n", p); }
 void reportPlants(void *plant, void *rp) {
   printf("found at %p (row@%d x col@%d)(hp:%d code:%d)\n", rp,
-         *INTP(plant + getOffset("plants_row")),
-         *INTP(plant + getOffset("plants_col")), *INTP(plant + PLAN_HP_OFF),
+         *INTP(plant + getOffset("plants_row")) + 1,
+         *INTP(plant + getOffset("plants_col")) + 1, *INTP(plant + PLAN_HP_OFF),
          *INTP(plant + getOffset("plants_type")));
 }
 void increasePlants(void *dp, void *rp) {
