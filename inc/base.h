@@ -13,11 +13,7 @@
 #include <unistd.h>
 #include <sys/cdefs.h>
 #include "defs.h"
-typedef struct ladder_task {
-  int row;
-  int col;
-  struct ladder_task *next;
-} ladder_task;
+#include "utils.h"
 struct {
   char *base;
   char *heap_base;
@@ -27,8 +23,8 @@ struct {
   int val;
   pid_t pid;
   ProcessDIR processDIR;
-  ladder_task *task;
-  ladder_task *task_helper;
+  __task *task;
+  __task *task_helper;
 } baseInfo;
 void initBase() {
   baseInfo.base = NULL;
@@ -38,24 +34,5 @@ void initBase() {
   baseInfo.task = NULL;
   baseInfo.task_helper = NULL;
 }
-inline static void insert(ladder_task **target, int row, int col) {
-  ladder_task *node = malloc(sizeof(ladder_task));
-  node->row = row;
-  node->col = col;
-  node->next = NULL;
-  if (*target == NULL) {
-    *target = node;
-  } else {
-    (*target)->next = node;
-  }
-}
-inline static void destroy(ladder_task **node) {
-  ladder_task *helper;
-  while (*node != NULL) {
-    helper = (*node)->next;
-    free(*node);
-    *node = helper;
-  }
-  *node = NULL;
-}
+
 #endif //__BASE__H

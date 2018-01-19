@@ -13,9 +13,9 @@
 #include <setjmp.h>
 #include <ctype.h>
 #include "defs.h"
+#include "utils.h"
 #include "base.h"
 #include "pvz.h"
-#include "pvz_offset.h"
 #include "cheater.h"
 int main(int argc, char **argv) {
   checkRootState();
@@ -46,11 +46,6 @@ int main(int argc, char **argv) {
     puts("11.搭梯");
     puts("12.炸荷叶烂南瓜");
     puts("13.退出");
-#define PANIC                                                                  \
-  do {                                                                         \
-    printf("无效输入\n");                                                      \
-    raise(SIGINT);                                                             \
-  } while (0)
 
 #define GETOPT(mess, opt)                                                      \
   printf(mess);                                                                \
@@ -95,78 +90,27 @@ int main(int argc, char **argv) {
       break;
     case 11: {
       BufferType buf;
-      const char *val = buf;
-      int row, col;
-      enum statusMachine {
-        NEED_DOT,
-        NEED_COMMA,
-        NEED_ROW,
-        NEED_COL,
-      } status = NEED_ROW;
       printf("要将梯子僵尸放于何列?\n例如:1.2,1.3,(行与列以英文句号分隔,"
              "多个行列以英文逗号分隔)");
       setbuf(stdin, NULL);
       if (fgets(buf, sizeof(buf), stdin) == NULL)
         PANIC;
-    parse:
-#define CHECK(stmt)                                                            \
-  if (!(stmt)) {                                                               \
-    printf("%s", buf);                                                         \
-    printf("%*s\n", val - buf + 1, "^");                                       \
-    goto panic;                                                                \
-  }
-#define DIGIT() (*val - '0')
-      if (*val == '\n') {
-        if (status != NEED_COMMA) {
-          --val;
-          CHECK(false);
-        }
-        goto putladder;
-      }
-      while (isspace(*val))
-        ++val;
-      switch (status) {
-      case NEED_ROW:
-        CHECK(isdigit(*val) && IN_RANGE(DIGIT(), 1, 6));
-        row = DIGIT();
-        status = NEED_DOT;
-        val++;
-        goto parse;
-      case NEED_COL:
-        CHECK(isdigit(*val) && IN_RANGE(DIGIT(), 1, 9));
-        col = DIGIT();
-        status = NEED_COMMA;
-        val++;
-        if (col != 1) {
-          insert(&baseInfo.task_helper, row, col);
-          if (baseInfo.task == NULL)
-            baseInfo.task = baseInfo.task_helper;
-          else
-            baseInfo.task_helper = baseInfo.task_helper->next;
-        } else {
-          printf("WARNING:忽略%d.%d\n", row, col);
-        }
-        goto parse;
-      case NEED_DOT:
-        CHECK('.' == *val);
-        status = NEED_COL;
-        val++;
-        goto parse;
-      case NEED_COMMA:
-        CHECK(',' == *val);
-        status = NEED_ROW;
-        val++;
-        goto parse;
-      }
-    panic:
-      PANIC;
-    putladder:
+      parseRowAndCol(buf, &baseInfo.task, &baseInfo.task_helper);
       while (baseInfo.task != NULL) {
         findZombies(putLadder);
         usleep(250000);
       }
     } break;
     case 12: {
+      BufferType buf;
+      printf("要去除何处的莲叶或破坏何处的南瓜?(行与列以英文句号分隔,"
+             "多个行列以英文逗号分隔");
+      setbuf(stdin, NULL);
+      if (fgets(buf, sizeof(buf), stdin) == NULL)
+        PANIC;
+      parseRowAndCol(buf, &baseInfo.task, &baseInfo.task_helper);
+      findPlants(fuck_LilyPad_Pumpkin);
+      destroy(&baseInfo.task);
     } break;
     case 13:
       free(baseInfo.heap_buf);

@@ -28,7 +28,7 @@ ifeq ($(NOUGHT),true)
 endif
 all:$(MODULE)
 $(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))
-cheater_src += ptrace.c
+cheater_src += ptrace.c src/utils.c
 $(foreach m,$(MODULE),$(eval TARGET := $(m))$(eval DEP := $($(m)_src) $(inc))$(eval include build/reg_rule.mk))
 .PHONY:release
 release:

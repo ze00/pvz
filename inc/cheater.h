@@ -189,9 +189,7 @@ void putLadder(void *local, void *remote) {
       pvz_write(remote + getOffset("zombies_pos_x"), &f, sizeof(f));
       pvz_write(remote + getOffset("zombies_pos_y"), &f, sizeof(f));
       printf("put ladder on %d:%d\n", baseInfo.task->row, baseInfo.task->col);
-      baseInfo.task_helper = baseInfo.task->next;
-      free(baseInfo.task);
-      baseInfo.task = baseInfo.task_helper;
+      pop(&baseInfo.task);
     }
   }
 }
@@ -203,7 +201,21 @@ void reportPlants(void *plant, void *rp) {
   printf("found at %p (row@%d x col@%d)(hp:%d code:%d)\n", rp, ROW(plant),
          COL(plant), HP(plant), CODE(plant));
 }
-void fuck_LilyPad_Pumpkin(void *local, void *remote) {}
+void fuck_LilyPad_Pumpkin(void *local, void *remote) {
+  if (has(baseInfo.task, ROW(local), COL(local))) {
+    switch (CODE(local)) {
+    case LILYPAD_CODE:
+      baseInfo.val = 1;
+      pvz_write(remote + getOffset("plants_vis"), &baseInfo.val,
+                sizeof(baseInfo.val));
+      break;
+    case PUMPKIN_CODE:
+      baseInfo.val = 1332;
+      pvz_write(remote + getOffset("plants_hp"), &baseInfo.val,
+                sizeof(baseInfo.val));
+    }
+  }
+}
 #undef ROW
 #undef COL
 #undef HP
