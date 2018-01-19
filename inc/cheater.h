@@ -154,12 +154,12 @@ void increaseCabbagePult() {
 void findPlants(void (*op)(void *, void *)) {
   char *buf = baseInfo.heap_buf;
   pvz_read(baseInfo.heap_base, buf, baseInfo.heap_size);
-  size_t maxIndex = baseInfo.heap_size - PLAN_HP_OFF;
+  size_t maxIndex = baseInfo.heap_size - PLAN_HP_TOTAL_OFF;
   int *helper;
   for (size_t i = 0; i < maxIndex; ++i) {
     helper = (int *)buf;
     if (helper[0] == 0x43200000 && helper[1] == 0x42200000 && helper[2] == 1 &&
-        IN_RANGE(helper[PLAN_HP_OFF / sizeof(int)], 300, 8000)) {
+        IN_RANGE(helper[PLAN_HP_TOTAL_OFF / sizeof(int)], 300, 8000)) {
       op(helper, baseInfo.heap_base + i);
     }
     ++buf;
@@ -205,7 +205,7 @@ void fuck_LilyPad_Pumpkin(void *local, void *remote) {
   if (has(baseInfo.task, ROW(local), COL(local))) {
     switch (CODE(local)) {
     case LILYPAD_CODE:
-      baseInfo.val = 1;
+      baseInfo.val = 0;
       pvz_write(remote + getOffset("plants_vis"), &baseInfo.val,
                 sizeof(baseInfo.val));
       break;

@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <setjmp.h>
-#include <ctype.h>
+#include <strings.h>
 #include "defs.h"
 #include "utils.h"
 #include "base.h"
@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
   baseInfo.heap_buf =
       createBuf(baseInfo.heap_end, baseInfo.heap_base, &baseInfo.heap_size);
   int option;
+  BufferType buf;
   registeSigHandle();
   if (setjmp(env) == SETJMP_RET) {
     puts("");
@@ -89,7 +90,6 @@ int main(int argc, char **argv) {
       findPlants(increasePlantsAttack);
       break;
     case 11: {
-      BufferType buf;
       printf("要将梯子僵尸放于何列?\n例如:1.2,1.3,(行与列以英文句号分隔,"
              "多个行列以英文逗号分隔)");
       setbuf(stdin, NULL);
@@ -102,7 +102,6 @@ int main(int argc, char **argv) {
       }
     } break;
     case 12: {
-      BufferType buf;
       printf("要去除何处的莲叶或破坏何处的南瓜?(行与列以英文句号分隔,"
              "多个行列以英文逗号分隔");
       setbuf(stdin, NULL);
@@ -111,6 +110,7 @@ int main(int argc, char **argv) {
       parseRowAndCol(buf, &baseInfo.task, &baseInfo.task_helper);
       findPlants(fuck_LilyPad_Pumpkin);
       destroy(&baseInfo.task);
+      baseInfo.task_helper = NULL;
     } break;
     case 13:
       free(baseInfo.heap_buf);

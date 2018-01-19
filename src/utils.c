@@ -26,9 +26,6 @@ void insert(__task **target, int row, int col) {
 void destroy(__task **node) {
   __task *helper;
   while (*node != NULL) {
-#ifdef DEBUG
-    printf("put node %d:%d\n", (*node)->row, (*node)->col);
-#endif
     helper = (*node)->next;
     free(*node);
     *node = helper;

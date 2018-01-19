@@ -13,6 +13,7 @@
 #include <sys/cdefs.h>
 #define ZOM_HP_OFF 0x54
 #define PLAN_HP_OFF 0x28
+#define PLAN_HP_TOTAL_OFF 0x2c
 #define PLAN_ATT_OFF 0x40
 #define PLAN_ATT_TOTAL_OFF 0x44
 #define PLAN_PEA_ATT_OFF 0x78
