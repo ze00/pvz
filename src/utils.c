@@ -45,6 +45,33 @@ int has(__task *target, int row, int col) {
   }
   return 0;
 }
+void insert_images(__images **target,int attack,void *remote) {
+  __images *node = malloc(sizeof(__images));
+  node->attack = attack;
+  node->remote = remote;
+  node->next = NULL;
+  if (*target == NULL) {
+    *target = node;
+  } else {
+    (*target)->next = node;
+  }
+}
+void destroy_images(__images **node) {
+  __images *helper;
+  while (*node != NULL) {
+    helper = (*node)->next;
+    free(*node);
+    *node = helper;
+  }
+  *node = NULL;
+}
+void recover_images(__images *node) {
+  while(node != NULL) {
+    extern void pvz_write(void *, void *, size_t);
+    pvz_write(node->remote,&node->attack,sizeof(node->attack));
+    node = node->next;
+  }
+}
 void parseRowAndCol(const char *buf, __task **head, __task **helper) {
   const char *val = buf;
   int row, col;

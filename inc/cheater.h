@@ -197,6 +197,7 @@ void putLadder(void *local, void *remote) {
 #define COL(lp) (*INTP(lp + getOffset("plants_col")) + 1)
 #define HP(lp) (*INTP(lp + PLAN_HP_OFF))
 #define CODE(lp) (*INTP(lp + getOffset("plants_type")))
+#define ATTACK(lp) (*INTP(lp + getOffset("plants_attack")))
 void reportPlants(void *plant, void *rp) {
   printf("found at %p (row@%d x col@%d)(hp:%d code:%d)\n", rp, ROW(plant),
          COL(plant), HP(plant), CODE(plant));
@@ -216,11 +217,25 @@ void fuck_LilyPad_Pumpkin(void *local, void *remote) {
     }
   }
 }
+void plants_freeze(void *local, void *remote) {
+  insert_images(&baseInfo.images_helper,ATTACK(local),remote + getOffset("plants_attack"));
+  if(baseInfo.images == NULL)
+    baseInfo.images = baseInfo.images_helper;
+  else
+    baseInfo.images_helper = baseInfo.images_helper->next;
+    baseInfo.val = 0;
+  pvz_write(remote + getOffset("plants_attack"), &baseInfo.val,
+      sizeof(baseInfo.val));
+}
+void plants_attack(void *local, void *remote) {
+  recover_images(baseInfo.images);
+  destroy_images(&baseInfo.images);
+  baseInfo.images_helper = NULL;
+}
 #undef ROW
 #undef COL
 #undef HP
 #undef CODE
-
 void catchSIGINT() {
   fflush(stdout);
   setbuf(stdin, NULL);

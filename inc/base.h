@@ -25,6 +25,8 @@ struct {
   ProcessDIR processDIR;
   __task *task;
   __task *task_helper;
+  __images *images;
+  __images *images_helper;
 } baseInfo;
 void initBase() {
   baseInfo.base = NULL;
@@ -33,6 +35,8 @@ void initBase() {
   baseInfo.heap_buf = NULL;
   baseInfo.task = NULL;
   baseInfo.task_helper = NULL;
+  baseInfo.images = NULL;
+  baseInfo.images_helper = NULL;
 }
 
 #endif //__BASE__H

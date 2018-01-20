@@ -37,7 +37,7 @@ struct pvz_offset pvz_off_tbl[] = {
     {"zombies_fly", OFF_MISC, 0x44},    {"zombies_hp", OFF_MISC, 0x54},
     {"plants_col", OFF_MISC, 0x10},     {"plants_vis", OFF_MISC, -0xc},
     {"plants_row", OFF_MISC, -0x8},     {"plants_type", OFF_MISC, 0xc},
-    {"plants_hp", OFF_MISC, 0x28},
+    {"plants_hp", OFF_MISC, 0x28},      {"plants_attack", OFF_MISC, 0x30},
 };
 off_t getOffset(const char *name) {
   off_t off = -1;

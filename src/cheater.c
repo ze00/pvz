@@ -22,6 +22,9 @@ int main(int argc, char **argv) {
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
   baseInfo.heap_base = (char *)getHeapBase();
+  if(baseInfo.heap_base == NULL) {
+    printf("failed to get heap base,please restart the game!\n");
+  }
 #ifdef DEBUG
   printf("Dynamic base %p,heap base %p\n", baseInfo.base, baseInfo.heap_base);
 #endif
@@ -46,7 +49,9 @@ int main(int argc, char **argv) {
     puts("10.植物攻速增加二倍");
     puts("11.搭梯");
     puts("12.炸荷叶烂南瓜");
-    puts("13.退出");
+    puts("13.所有植物不攻击");
+    puts("14.恢复攻击");
+    puts("15.退出");
 
 #define GETOPT(mess, opt)                                                      \
   printf(mess);                                                                \
@@ -100,6 +105,7 @@ int main(int argc, char **argv) {
         findZombies(putLadder);
         usleep(250000);
       }
+      baseInfo.task_helper = NULL;
     } break;
     case 12: {
       printf("要去除何处的莲叶或破坏何处的南瓜?(行与列以英文句号分隔,"
@@ -113,6 +119,12 @@ int main(int argc, char **argv) {
       baseInfo.task_helper = NULL;
     } break;
     case 13:
+      findPlants(plants_freeze);
+      break;
+    case 14:
+      findPlants(plants_attack);
+      break;
+    case 15:
       free(baseInfo.heap_buf);
       return 0;
     default:
