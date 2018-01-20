@@ -218,14 +218,17 @@ void fuck_LilyPad_Pumpkin(void *local, void *remote) {
   }
 }
 void plants_freeze(void *local, void *remote) {
-  insert_images(&baseInfo.images_helper,ATTACK(local),remote + getOffset("plants_attack"));
-  if(baseInfo.images == NULL)
+  if (ATTACK(local) == 0)
+    return;
+  insert_images(&baseInfo.images_helper, ATTACK(local),
+                remote + getOffset("plants_attack"));
+  if (baseInfo.images == NULL)
     baseInfo.images = baseInfo.images_helper;
   else
     baseInfo.images_helper = baseInfo.images_helper->next;
-    baseInfo.val = 0;
+  baseInfo.val = 0;
   pvz_write(remote + getOffset("plants_attack"), &baseInfo.val,
-      sizeof(baseInfo.val));
+            sizeof(baseInfo.val));
 }
 void plants_attack(void *local, void *remote) {
   recover_images(baseInfo.images);

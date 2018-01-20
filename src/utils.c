@@ -45,7 +45,7 @@ int has(__task *target, int row, int col) {
   }
   return 0;
 }
-void insert_images(__images **target,int attack,void *remote) {
+void insert_images(__images **target, int attack, void *remote) {
   __images *node = malloc(sizeof(__images));
   node->attack = attack;
   node->remote = remote;
@@ -66,9 +66,9 @@ void destroy_images(__images **node) {
   *node = NULL;
 }
 void recover_images(__images *node) {
-  while(node != NULL) {
+  while (node != NULL) {
     extern void pvz_write(void *, void *, size_t);
-    pvz_write(node->remote,&node->attack,sizeof(node->attack));
+    pvz_write(node->remote, &node->attack, sizeof(node->attack));
     node = node->next;
   }
 }

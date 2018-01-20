@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
   baseInfo.heap_base = (char *)getHeapBase();
-  if(baseInfo.heap_base == NULL) {
+  if (baseInfo.heap_base == NULL) {
     printf("failed to get heap base,please restart the game!\n");
   }
 #ifdef DEBUG
