@@ -17,7 +17,7 @@
 #include <sys/mman.h>
 size_t padding(size_t size) {
   unsigned long pagesize = getpagesize();
-  return size + (pagesize - ((size & pagesize - 1) & (pagesize - 1)));
+  return size + (pagesize - ((size & (pagesize - 1)) & (pagesize - 1)));
 }
 const Elf32_Shdr *getSectionTableHeader(Elf32_Ehdr *hdr) {
   return (Elf32_Shdr *)((const char *)hdr + hdr->e_shstrndx * hdr->e_shentsize +
@@ -40,14 +40,14 @@ void dumpAt(char *rawHandle, Elf32_Shdr *sec, const char *stbl, int num) {
   size_t i = sec->sh_size;
   while (i) {
     if (*(int *)sym == num) {
-      printf("found at offset %p (%p,%s)\n", (void *)(sym - rawHandle),
-             (void *)sec->sh_offset, getSectionName(stbl, sec));
+      printf("found at offset %p (%#x,%s)\n", (void *)(sym - rawHandle),
+             sec->sh_offset, getSectionName(stbl, sec));
     }
     ++sym;
     --i;
   }
 }
 void reportVaddr(const char *stbl, Elf32_Shdr *sec) {
-  printf("%s at Vaddr:%p\n", getSectionName(stbl, sec), (void *)sec->sh_addr);
+  printf("%s at Vaddr:%#x\n", getSectionName(stbl, sec), sec->sh_addr);
 }
 #endif //__ELFUTILS__H

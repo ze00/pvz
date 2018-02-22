@@ -32,18 +32,18 @@ cheater_src += ptrace.c src/utils.c
 $(foreach m,$(MODULE),$(eval TARGET := $(m))$(eval DEP := $($(m)_src) $(inc))$(eval include build/reg_rule.mk))
 .PHONY:release
 release:
-	make NDK_BUILD=true NOUGHT=true
-	cp cheater release/arm/cheater_nought
-	make clean
-	make NDK_BUILD=true
-	cp cheater release/arm/cheater_marshmallow
-	make clean
-	make NDK_BUILD=true NOUGHT=true ARM64=true
-	cp cheater release/arm64/cheater_nought
-	make clean
-	make NDK_BUILD=true ARM64=true
-	cp cheater release/arm64/cheater_marshmallow
-	make clean
+	make NDK_BUILD=true NOUGHT=true --no-print-directory
+	@ cp cheater release/arm/cheater_nought
+	@ make clean
+	make NDK_BUILD=true --no-print-directory
+	@ cp cheater release/arm/cheater_marshmallow
+	@ make clean
+	make NDK_BUILD=true NOUGHT=true ARM64=true --no-print-directory
+	@ cp cheater release/arm64/cheater_nought
+	@ make clean
+	make NDK_BUILD=true ARM64=true --no-print-directory
+	@ cp cheater release/arm64/cheater_marshmallow
+	@ make clean
 .PHONY:clean
 clean:
 	-@ rm -rf $(MODULE)

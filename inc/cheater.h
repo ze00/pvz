@@ -67,7 +67,7 @@ void getBaseAndEnd(void *buf, void *base, void *end) {
   sscanf(buf, "%8x-%8x", (int *)base, (int *)end);
 }
 void getNoughtBaseAndEnd(void *buf, void __unused *base, void __unused *end) {
-  int f, g;
+  unsigned int f, g;
   sscanf(buf, "%8x-%8x", &f, &g);
   // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
   // 不知道为什么这条代码会出问题
