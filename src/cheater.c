@@ -25,9 +25,7 @@ int main(int argc, char **argv) {
   if (baseInfo.heap_base == NULL) {
     printf("failed to get heap base,please restart the game!\n");
   }
-#ifdef DEBUG
   printf("Dynamic base %p,heap base %p\n", baseInfo.base, baseInfo.heap_base);
-#endif
   baseInfo.heap_buf =
       createBuf(baseInfo.heap_end, baseInfo.heap_base, &baseInfo.heap_size);
   int option;
@@ -67,7 +65,7 @@ int main(int argc, char **argv) {
     case 2:
       while (1) {
         findZombies(letZombiesFragile);
-        usleep(500000);
+        usleep(WAIT_USECONDS);
       }
       break;
     case 3:
@@ -103,7 +101,7 @@ int main(int argc, char **argv) {
       parseRowAndCol(buf, &baseInfo.task, &baseInfo.task_helper);
       while (baseInfo.task != NULL) {
         findZombies(putLadder);
-        usleep(250000);
+        usleep(WAIT_USECONDS);
       }
       baseInfo.task_helper = NULL;
     } break;

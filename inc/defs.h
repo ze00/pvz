@@ -10,21 +10,11 @@
 #ifndef __DEFS__H
 #define __DEFS__H
 #include <limits.h>
-#ifndef SPECIFIC_PACKAGE
-#define SPECIFIC_PACKAGE "com.popcap.pvz_na"
-#endif
-#ifndef SPECIFIC_DYNAMIC_LIBRARIES
-#define SPECIFIC_DYNAMIC_LIBRARIES "libpvz.so"
-#endif
 #define BUFSIZE 255
-#define COINS_HELPER_BUFF 256
-#define COINS_HELPER_OFF 0x7aa300
 #define IN_RANGE(obj, min, max) (obj >= min && obj <= max)
-#define CARDS_PLAN_TPYE_OFF 0x8
 #define SETJMP_RET 0xff
 #define INTP(p) ((int *)(p))
-#define PUMPKIN_CODE (30)
-#define LILYPAD_CODE (16)
+#define WAIT_USECONDS (500000)
 typedef char BufferType[BUFSIZE];
 typedef char ProcessDIR[PATH_MAX];
 typedef char Path[PATH_MAX];

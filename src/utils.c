@@ -85,7 +85,7 @@ parse:
 #define CHECK(stmt)                                                            \
   if (!(stmt)) {                                                               \
     printf("%s", buf);                                                         \
-    printf("%*s\n", (int)((val - buf) + 1), "^");                                       \
+    printf("%*s\n", (int)((val - buf) + 1), "^");                              \
     goto panic;                                                                \
   }
 #define DIGIT() (*val - '0')
