@@ -9,6 +9,7 @@
 #ifndef __UTILS__H
 #define __UTILS__H
 #include <stdint.h>
+#include "defs.h"
 #define PANIC                                                                  \
   do {                                                                         \
     printf("无效输入\n");                                                      \
@@ -47,4 +48,6 @@ extern void destroy_heaps(__heaps **);
 extern void destroy(__list **, void (*)(void *));
 extern void *insert(__list **, size_t);
 extern void parseRowAndCol(const char *, __task **);
+extern void checkRootState();
+extern pid_t findPVZProcess(ProcessDIR);
 #endif //__UTILS__H

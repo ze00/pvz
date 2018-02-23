@@ -13,16 +13,9 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pvz.h"
 #include "pvz_offset.h"
 #include "base.h"
 #include "scanmem.h"
-void checkRootState() {
-  if (getuid() != 0 || getgid() != 0) {
-    printf("must run me under root mode\n");
-    exit(-1);
-  }
-}
 void pvz_write(void *rp, void *buf, size_t len) {
   if (!sm_write_array(baseInfo.pid, rp, buf, len)) {
     printf("cannot write memory at %p,'%s' has died?\n", rp, SPECIFIC_PACKAGE);
@@ -37,7 +30,7 @@ void pvz_read(void *rp, void *buf, size_t len) {
 }
 void *getBase(const char *spec, int findFirst,
               void (*action)(void *, void *, void *), void *end) {
-  unsigned int base;
+  void *base;
   Path vmMaps;
   sprintf(vmMaps, "%s/maps", baseInfo.processDIR);
   FILE *maps = fopen(vmMaps, "r");
@@ -45,7 +38,7 @@ void *getBase(const char *spec, int findFirst,
   while (fgets(buf, BUFSIZE, maps) != NULL) {
     if (strstr(buf, spec)) {
       if (action == NULL)
-        sscanf(buf, "%8x", &base);
+        sscanf(buf, "%8x", (intptr_t *)&base);
       else
         action(buf, &base, end);
       if (findFirst)
@@ -53,7 +46,7 @@ void *getBase(const char *spec, int findFirst,
     }
   }
   fclose(maps);
-  return (void *)base;
+  return base;
 }
 void *getDynamicBase() {
   pid_t pid = findPVZProcess(baseInfo.processDIR);
@@ -94,7 +87,6 @@ void changeCoins() {
     }
     hp++;
   }
-  printf("%p\n", bp + off - 4);
   pvz_write(bp + off - 4, &baseInfo.val, sizeof(baseInfo.val));
   printf("now set coins to %d\n", baseInfo.val);
 }

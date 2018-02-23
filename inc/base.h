@@ -30,5 +30,4 @@ void initBase() {
   baseInfo.task = NULL;
   baseInfo.images = NULL;
 }
-
 #endif //__BASE__H

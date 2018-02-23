@@ -8,9 +8,13 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <ctype.h>
+#include <unistd.h>
 #include <signal.h>
 #include "defs.h"
+#include "scanmem.h"
+#include "pvz.h"
 #include "utils.h"
 void *insert(__list **target, size_t len) {
   __list *node = malloc(len);
@@ -85,7 +89,7 @@ void free_buf(__heaps *heap) { free(heap->buf); }
 void destroy_heaps(__heaps **node) {
   destroy((__list **)node, (void (*)(void *))free_buf);
 }
-void parseRowAndCol(const char *buf, __task **head) {
+void parseRowAndCol(const char *buf, __task **task) {
   const char *val = buf;
   int row, col;
   enum statusMachine {
@@ -123,7 +127,7 @@ parse:
     col = DIGIT();
     status = NEED_COMMA;
     val++;
-    insert_task(head, row, col);
+    insert_task(task, row, col);
     goto parse;
   case NEED_DOT:
     CHECK('.' == *val);
@@ -143,3 +147,37 @@ out:
 }
 #undef CHECK
 #undef DIGIT
+void checkRootState() {
+  if (getuid() != 0 || getgid() != 0) {
+    printf("must run me under root mode\n");
+    exit(-1);
+  }
+}
+int isReadable(Path path) { return access(path, R_OK) == 0; }
+pid_t findPVZProcess(ProcessDIR processDIR) {
+  DIR *dp = opendir("/proc");
+  FILE *fp;
+  struct dirent *dirHandle;
+  pid_t pid = -1;
+  Path packageNameProvider;
+  BufferType buf;
+  while ((dirHandle = readdir(dp))) {
+    // 文件名第一个字符是数字
+    if (dirHandle->d_type & DT_DIR && isdigit(*dirHandle->d_name)) {
+      sprintf(processDIR, "/proc/%s", dirHandle->d_name);
+      sprintf(packageNameProvider, "%s/cmdline", processDIR);
+      if (isReadable(packageNameProvider)) {
+        fp = fopen(packageNameProvider, "r");
+        fgets(buf, BUFSIZE, fp);
+        if (strcmp(buf, SPECIFIC_PACKAGE) == 0) {
+          pid = atoi(dirHandle->d_name);
+          fclose(fp);
+          break;
+        }
+        fclose(fp);
+      }
+    }
+  }
+  closedir(dp);
+  return pid;
+}
