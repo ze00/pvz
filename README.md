@@ -3,7 +3,7 @@
     ![pvz](doc/pvz.png)
   * 需要Root权限
 ## 使用步骤
-  * 获取一个北美版的植物大战僵尸
+  * 获取一个北美版的植物大战僵尸(目前可能必须要使用我提供的pvz主程序，否则不保证功能能够正常使用)
     本人所使用的北美版:链接: https://pan.baidu.com/s/1d1T0K2 密码: y98i (本文档第一张图即是详细的版本信息，感谢植物大战僵尸吧@囧丫乙) 
 
     具体安装教程:http://lonelystar.org/ResDownload/1_Android_Na.htm
