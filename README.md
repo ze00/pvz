@@ -4,7 +4,8 @@
   * 需要Root权限
 ## 使用步骤
   * 获取一个北美版的植物大战僵尸
-    本人所使用的北美版:链接: https://pan.baidu.com/s/1d1T0K2 密码: y98i (本文档第一张图即是详细的版本信息，感谢植物大战僵尸吧@囧丫乙)
+    本人所使用的北美版:链接: https://pan.baidu.com/s/1d1T0K2 密码: y98i (本文档第一张图即是详细的版本信息，感谢植物大战僵尸吧@囧丫乙) 
+
     具体安装教程:http://lonelystar.org/ResDownload/1_Android_Na.htm
   * 安装NeoTerm
     https://www.coolapk.com/apk/io.neoterm
