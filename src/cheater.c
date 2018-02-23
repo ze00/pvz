@@ -21,13 +21,11 @@ int main(int argc, char **argv) {
   checkRootState();
   int *base = getDynamicBase();
   baseInfo.base = (char *)base;
-  baseInfo.heap_base = (char *)getHeapBase();
-  if (baseInfo.heap_base == NULL) {
+  getHeapBase();
+  if (baseInfo.heap == NULL) {
     printf("failed to get heap base,please restart the game!\n");
   }
-  printf("Dynamic base %p,heap base %p\n", baseInfo.base, baseInfo.heap_base);
-  baseInfo.heap_buf =
-      createBuf(baseInfo.heap_end, baseInfo.heap_base, &baseInfo.heap_size);
+  printf("Dynamic base %p\n", baseInfo.base);
   int option;
   BufferType buf;
   registeSigHandle();
@@ -123,12 +121,12 @@ int main(int argc, char **argv) {
       findPlants(plants_attack);
       break;
     case 15:
-      free(baseInfo.heap_buf);
+      destroy_heaps(&baseInfo.heap);
       return 0;
     default:
       printf("输入错误...\n");
     }
   }
-  free(baseInfo.heap_buf);
+  destroy_heaps(&baseInfo.heap);
   return 0;
 }

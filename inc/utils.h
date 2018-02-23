@@ -24,6 +24,13 @@ typedef struct __images {
   int attack;
   void *remote;
 } __images;
+typedef struct __heaps {
+  struct __heaps *next;
+  char *base;
+  char *end;
+  char *buf;
+  size_t heap_size;
+} __heaps;
 extern void insert(__task **, int, int);
 extern void destroy(__task **);
 extern void pop(__task **);
@@ -31,5 +38,7 @@ extern int has(__task *, int, int);
 extern void insert_images(__images **, int, void *);
 extern void destroy_images(__images **);
 extern void recover_images(__images *);
+extern void insert_heaps(__heaps **, char *, char *);
+extern void destroy_heaps(__heaps **);
 extern void parseRowAndCol(const char *, __task **, __task **);
 #endif //__UTILS__H

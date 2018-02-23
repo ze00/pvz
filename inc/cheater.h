@@ -63,25 +63,18 @@ int *getDynamicBase() {
   baseInfo.pid = pid;
   return (int *)getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, NULL);
 }
-void getBaseAndEnd(void *buf, void *base, void *end) {
-  sscanf(buf, "%8x-%8x", (int *)base, (int *)end);
-}
-void getNoughtBaseAndEnd(void *buf, void __unused *base, void __unused *end) {
-  unsigned int f, g;
-  sscanf(buf, "%8x-%8x", &f, &g);
+void getBaseAndEnd(void *buf, void __unused *base, void __unused *end) {
+  void *f, *g;
+  sscanf(buf, "%8x-%8x", INTP(&f), INTP(&g));
   // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
   // 不知道为什么这条代码会出问题
-  if (g - f == 0x300000) {
-    baseInfo.heap_base = (void *)f;
-    baseInfo.heap_end = (void *)g;
-  }
+  insert_heaps(&baseInfo.heap, f, g);
 }
 int *getHeapBase() {
 #ifdef NOUGHT
-  getBase("[anon:libc_malloc]", 0, getNoughtBaseAndEnd, &baseInfo.heap_end);
-  return (int *)baseInfo.heap_base;
+  return (int *)getBase("[anon:libc_malloc]", 0, getBaseAndEnd, NULL);
 #else
-  return (int *)getBase("[heap]", 0, getBaseAndEnd, &baseInfo.heap_end);
+  return (int *)getBase("[heap]", 0, getBaseAndEnd, NULL);
 #endif
 }
 
@@ -111,23 +104,23 @@ void removeColdDown() {
     p -= 9;
   }
 }
-void *createBuf(char *end, char *begin, size_t *size) {
-  size_t memsz = end - begin;
-  *size = memsz;
-  return malloc(memsz);
-}
 void findZombies(void (*op)(void *, void *)) {
-  char *buf = baseInfo.heap_buf;
-  pvz_read(baseInfo.heap_base, buf, baseInfo.heap_size);
-  size_t maxIndex = baseInfo.heap_size - ZOM_HP_OFF;
-  int *helper;
-  for (size_t i = 0; i < maxIndex; ++i) {
-    helper = (int *)buf;
-    if (helper[0] == 0xffffffff && helper[1] == 0x0 &&
-        helper[2] == 0xffffffff && helper[3] == 0xffffffff && helper[4] == 0) {
-      op(helper, baseInfo.heap_base + i);
+  __heaps *heap = baseInfo.heap;
+  while (heap != NULL) {
+    char *buf = heap->buf;
+    pvz_read(heap->base, buf, heap->heap_size);
+    size_t maxIndex = heap->heap_size - ZOM_HP_OFF;
+    int *helper;
+    for (size_t i = 0; i < maxIndex; ++i) {
+      helper = (int *)buf;
+      if (helper[0] == 0xffffffff && helper[1] == 0x0 &&
+          helper[2] == 0xffffffff && helper[3] == 0xffffffff &&
+          helper[4] == 0) {
+        op(helper, heap->base + i);
+      }
+      ++buf;
     }
-    ++buf;
+    heap = heap->next;
   }
 }
 void letZombiesFragile(void *dp, void *rp) {
@@ -152,17 +145,22 @@ void increaseCabbagePult() {
   pvz_write(p + 8, &v, sizeof(v));
 }
 void findPlants(void (*op)(void *, void *)) {
-  char *buf = baseInfo.heap_buf;
-  pvz_read(baseInfo.heap_base, buf, baseInfo.heap_size);
-  size_t maxIndex = baseInfo.heap_size - PLAN_HP_TOTAL_OFF;
-  int *helper;
-  for (size_t i = 0; i < maxIndex; ++i) {
-    helper = (int *)buf;
-    if (helper[0] == 0x43200000 && helper[1] == 0x42200000 && helper[2] == 1 &&
-        IN_RANGE(helper[PLAN_HP_TOTAL_OFF / sizeof(int)], 300, 8000)) {
-      op(helper, baseInfo.heap_base + i);
+  __heaps *heap = baseInfo.heap;
+  while (heap != NULL) {
+    char *buf = heap->buf;
+    pvz_read(heap->base, buf, heap->heap_size);
+    size_t maxIndex = heap->heap_size - PLAN_HP_TOTAL_OFF;
+    int *helper;
+    for (size_t i = 0; i < maxIndex; ++i) {
+      helper = (int *)buf;
+      if (helper[0] == 0x43200000 && helper[1] == 0x42200000 &&
+          helper[2] == 1 &&
+          IN_RANGE(helper[PLAN_HP_TOTAL_OFF / sizeof(int)], 300, 8000)) {
+        op(helper, heap->base + i);
+      }
+      ++buf;
     }
-    ++buf;
+    heap = heap->next;
   }
 }
 void report(void *__unused __, void *p) { printf("found at %p\n", p); }

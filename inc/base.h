@@ -16,10 +16,7 @@
 #include "utils.h"
 struct {
   char *base;
-  char *heap_base;
-  char *heap_end;
-  char *heap_buf;
-  size_t heap_size;
+  __heaps *heap;
   int val;
   pid_t pid;
   ProcessDIR processDIR;
@@ -30,9 +27,7 @@ struct {
 } baseInfo;
 void initBase() {
   baseInfo.base = NULL;
-  baseInfo.heap_base = NULL;
-  baseInfo.heap_end = NULL;
-  baseInfo.heap_buf = NULL;
+  baseInfo.heap = NULL;
   baseInfo.task = NULL;
   baseInfo.task_helper = NULL;
   baseInfo.images = NULL;

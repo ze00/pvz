@@ -72,6 +72,30 @@ void recover_images(__images *node) {
     node = node->next;
   }
 }
+void insert_heaps(__heaps **heap, char *base, char *end) {
+  __heaps *node = malloc(sizeof(__heaps));
+  node->base = base;
+  node->end = end;
+  node->next = NULL;
+  node->heap_size = end - base;
+  node->buf = malloc(node->heap_size);
+  printf("Found heap %p ... %p\n", base, end);
+  if (*heap == NULL) {
+    *heap = node;
+  } else {
+    (*heap)->next = node;
+  }
+}
+void destroy_heaps(__heaps **node) {
+  __heaps *helper;
+  while (*node != NULL) {
+    helper = (*node)->next;
+    free((*node)->buf);
+    free(*node);
+    *node = helper;
+  }
+  *node = NULL;
+}
 void parseRowAndCol(const char *buf, __task **head, __task **helper) {
   const char *val = buf;
   int row, col;
