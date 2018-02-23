@@ -8,37 +8,43 @@
  */
 #ifndef __UTILS__H
 #define __UTILS__H
-
+#include <stdint.h>
 #define PANIC                                                                  \
   do {                                                                         \
     printf("无效输入\n");                                                      \
     raise(SIGINT);                                                             \
   } while (0)
+typedef struct __list {
+  void *next;
+  void *real;
+} __list;
 typedef struct __task {
-  int row;
-  int col;
-  struct __task *next;
+  __list list;
+  int32_t row;
+  int32_t col;
 } __task;
 typedef struct __images {
-  struct __images *next;
-  int attack;
+  __list list;
+  int32_t attack;
   void *remote;
 } __images;
 typedef struct __heaps {
-  struct __heaps *next;
+  __list list;
   char *base;
   char *end;
   char *buf;
   size_t heap_size;
 } __heaps;
+
+#define next(x) ((x)->list.next)
+#define real(x) ((x)->list.real)
 extern void insert(__task **, int, int);
-extern void destroy(__task **);
 extern void pop(__task **);
 extern int has(__task *, int, int);
 extern void insert_images(__images **, int, void *);
-extern void destroy_images(__images **);
 extern void recover_images(__images *);
 extern void insert_heaps(__heaps **, char *, char *);
 extern void destroy_heaps(__heaps **);
-extern void parseRowAndCol(const char *, __task **, __task **);
+extern void destroy(void **, void (*)(void *));
+extern void parseRowAndCol(const char *, __task **);
 #endif //__UTILS__H

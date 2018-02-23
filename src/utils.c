@@ -16,24 +16,31 @@ void insert(__task **target, int row, int col) {
   __task *node = malloc(sizeof(__task));
   node->row = row;
   node->col = col;
-  node->next = NULL;
+  next(node) = NULL;
   if (*target == NULL) {
     *target = node;
+    real(*target) = node;
   } else {
-    (*target)->next = node;
+    next((__task *)real(*target)) = node;
+    real(*target) = node;
   }
 }
-void destroy(__task **node) {
-  __task *helper;
+void destroy(void **rawnode, void (*op)(void *)) {
+  __list **node = (__list **)rawnode;
+  __list *helper;
   while (*node != NULL) {
     helper = (*node)->next;
+    if (op != NULL)
+      op(*node);
     free(*node);
     *node = helper;
   }
+  if (*node != NULL)
+    (*node)->real = NULL;
   *node = NULL;
 }
 void pop(__task **target) {
-  __task *helper = (*target)->next;
+  __task *helper = next(*target);
   free(*target);
   *target = helper;
 }
@@ -41,7 +48,7 @@ int has(__task *target, int row, int col) {
   while (target != NULL) {
     if (target->row == row && target->col == col)
       return 1;
-    target = target->next;
+    target = next(target);
   }
   return 0;
 }
@@ -49,54 +56,46 @@ void insert_images(__images **target, int attack, void *remote) {
   __images *node = malloc(sizeof(__images));
   node->attack = attack;
   node->remote = remote;
-  node->next = NULL;
+  next(node) = NULL;
   if (*target == NULL) {
     *target = node;
+    real(*target) = node;
   } else {
-    (*target)->next = node;
+    next((__images *)real(*target)) = node;
+    real(*target) = node;
   }
-}
-void destroy_images(__images **node) {
-  __images *helper;
-  while (*node != NULL) {
-    helper = (*node)->next;
-    free(*node);
-    *node = helper;
-  }
-  *node = NULL;
 }
 void recover_images(__images *node) {
   while (node != NULL) {
     extern void pvz_write(void *, void *, size_t);
     pvz_write(node->remote, &node->attack, sizeof(node->attack));
-    node = node->next;
+    node = next(node);
   }
 }
 void insert_heaps(__heaps **heap, char *base, char *end) {
   __heaps *node = malloc(sizeof(__heaps));
   node->base = base;
   node->end = end;
-  node->next = NULL;
+  next(node) = NULL;
   node->heap_size = end - base;
-  node->buf = malloc(node->heap_size);
   printf("Found heap %p ... %p\n", base, end);
+  node->buf = malloc(node->heap_size);
+  if (node->buf == NULL) {
+    printf("Cannt allocate '%zu' byte memory...\n", node->heap_size);
+  }
   if (*heap == NULL) {
     *heap = node;
+    real(*heap) = node;
   } else {
-    (*heap)->next = node;
+    next((__heaps *)real(*heap)) = node;
+    real(*heap) = node;
   }
 }
+void free_buf(__heaps *heap) { free(heap->buf); }
 void destroy_heaps(__heaps **node) {
-  __heaps *helper;
-  while (*node != NULL) {
-    helper = (*node)->next;
-    free((*node)->buf);
-    free(*node);
-    *node = helper;
-  }
-  *node = NULL;
+  destroy((void **)node, (void (*)(void *))free_buf);
 }
-void parseRowAndCol(const char *buf, __task **head, __task **helper) {
+void parseRowAndCol(const char *buf, __task **head) {
   const char *val = buf;
   int row, col;
   enum statusMachine {
@@ -134,11 +133,7 @@ parse:
     col = DIGIT();
     status = NEED_COMMA;
     val++;
-    insert(helper, row, col);
-    if (*head == NULL)
-      *head = *helper;
-    else
-      *helper = (*helper)->next;
+    insert(head, row, col);
     goto parse;
   case NEED_DOT:
     CHECK('.' == *val);

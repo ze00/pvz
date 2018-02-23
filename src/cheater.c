@@ -19,11 +19,10 @@
 #include "cheater.h"
 int main(int argc, char **argv) {
   checkRootState();
-  int *base = getDynamicBase();
-  baseInfo.base = (char *)base;
+  baseInfo.base = getDynamicBase();
   getHeapBase();
   if (baseInfo.heap == NULL) {
-    printf("failed to get heap base,please restart the game!\n");
+    printf("Failed to get heap base,please restart the game!\n");
   }
   printf("Dynamic base %p\n", baseInfo.base);
   int option;
@@ -96,12 +95,12 @@ int main(int argc, char **argv) {
       setbuf(stdin, NULL);
       if (fgets(buf, sizeof(buf), stdin) == NULL)
         PANIC;
-      parseRowAndCol(buf, &baseInfo.task, &baseInfo.task_helper);
+      parseRowAndCol(buf, &baseInfo.task);
       while (baseInfo.task != NULL) {
         findZombies(putLadder);
         usleep(WAIT_USECONDS);
       }
-      baseInfo.task_helper = NULL;
+      real(baseInfo.task) = NULL;
     } break;
     case 12: {
       printf("要去除何处的莲叶或破坏何处的南瓜?(行与列以英文句号分隔,"
@@ -109,10 +108,9 @@ int main(int argc, char **argv) {
       setbuf(stdin, NULL);
       if (fgets(buf, sizeof(buf), stdin) == NULL)
         PANIC;
-      parseRowAndCol(buf, &baseInfo.task, &baseInfo.task_helper);
+      parseRowAndCol(buf, &baseInfo.task);
       findPlants(fuck_LilyPad_Pumpkin);
-      destroy(&baseInfo.task);
-      baseInfo.task_helper = NULL;
+      destroy((void **)&baseInfo.task, NULL);
     } break;
     case 13:
       findPlants(plants_freeze);
