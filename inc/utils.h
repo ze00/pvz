@@ -38,13 +38,13 @@ typedef struct __heaps {
 
 #define next(x) ((x)->list.next)
 #define real(x) ((x)->list.real)
-extern void insert(__task **, int, int);
 extern void pop(__task **);
 extern int has(__task *, int, int);
 extern void insert_images(__images **, int, void *);
 extern void recover_images(__images *);
 extern void insert_heaps(__heaps **, char *, char *);
 extern void destroy_heaps(__heaps **);
-extern void destroy(void **, void (*)(void *));
+extern void destroy(__list **, void (*)(void *));
+extern void *insert(__list **, size_t);
 extern void parseRowAndCol(const char *, __task **);
 #endif //__UTILS__H

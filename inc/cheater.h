@@ -228,7 +228,7 @@ void plants_freeze(void *local, void *remote) {
 }
 void plants_attack(void *local, void *remote) {
   recover_images(baseInfo.images);
-  destroy((void **)&baseInfo.images, NULL);
+  destroy((__list **)&baseInfo.images, NULL);
 }
 #undef ROW
 #undef COL
@@ -237,7 +237,7 @@ void plants_attack(void *local, void *remote) {
 void catchSIGINT() {
   fflush(stdout);
   setbuf(stdin, NULL);
-  destroy((void **)&baseInfo.task, NULL);
+  destroy((__list **)&baseInfo.task, NULL);
   destroy_heaps(&baseInfo.heap);
   longjmp(env, SETJMP_RET);
 }

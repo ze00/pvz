@@ -12,21 +12,19 @@
 #include <signal.h>
 #include "defs.h"
 #include "utils.h"
-void insert(__task **target, int row, int col) {
-  __task *node = malloc(sizeof(__task));
-  node->row = row;
-  node->col = col;
-  next(node) = NULL;
+void *insert(__list **target, size_t len) {
+  __list *node = malloc(len);
+  node->next = NULL;
   if (*target == NULL) {
     *target = node;
-    real(*target) = node;
+    (*target)->real = node;
   } else {
-    next((__task *)real(*target)) = node;
-    real(*target) = node;
+    ((__list *)(*target)->real)->next = node;
+    (*target)->real = node;
   }
+  return node;
 }
-void destroy(void **rawnode, void (*op)(void *)) {
-  __list **node = (__list **)rawnode;
+void destroy(__list **node, void (*op)(void *)) {
   __list *helper;
   while (*node != NULL) {
     helper = (*node)->next;
@@ -38,6 +36,11 @@ void destroy(void **rawnode, void (*op)(void *)) {
   if (*node != NULL)
     (*node)->real = NULL;
   *node = NULL;
+}
+void insert_task(__task **target, int row, int col) {
+  __task *node = insert((__list **)target, sizeof(__task));
+  node->row = row;
+  node->col = col;
 }
 void pop(__task **target) {
   __task *helper = next(*target);
@@ -53,17 +56,9 @@ int has(__task *target, int row, int col) {
   return 0;
 }
 void insert_images(__images **target, int attack, void *remote) {
-  __images *node = malloc(sizeof(__images));
+  __images *node = insert((__list **)target, sizeof(__images));
   node->attack = attack;
   node->remote = remote;
-  next(node) = NULL;
-  if (*target == NULL) {
-    *target = node;
-    real(*target) = node;
-  } else {
-    next((__images *)real(*target)) = node;
-    real(*target) = node;
-  }
 }
 void recover_images(__images *node) {
   while (node != NULL) {
@@ -73,27 +68,22 @@ void recover_images(__images *node) {
   }
 }
 void insert_heaps(__heaps **heap, char *base, char *end) {
-  __heaps *node = malloc(sizeof(__heaps));
+  __heaps *node = insert((__list **)heap, sizeof(__heaps));
   node->base = base;
   node->end = end;
-  next(node) = NULL;
   node->heap_size = end - base;
   printf("Found heap %p ... %p\n", base, end);
+  // 这里的malloc做一下检查
+  // 因为这里malloc的内存都比较大
+  // insert那里malloc基本不可能失败
   node->buf = malloc(node->heap_size);
   if (node->buf == NULL) {
     printf("Cannt allocate '%zu' byte memory...\n", node->heap_size);
   }
-  if (*heap == NULL) {
-    *heap = node;
-    real(*heap) = node;
-  } else {
-    next((__heaps *)real(*heap)) = node;
-    real(*heap) = node;
-  }
 }
 void free_buf(__heaps *heap) { free(heap->buf); }
 void destroy_heaps(__heaps **node) {
-  destroy((void **)node, (void (*)(void *))free_buf);
+  destroy((__list **)node, (void (*)(void *))free_buf);
 }
 void parseRowAndCol(const char *buf, __task **head) {
   const char *val = buf;
@@ -133,7 +123,7 @@ parse:
     col = DIGIT();
     status = NEED_COMMA;
     val++;
-    insert(head, row, col);
+    insert_task(head, row, col);
     goto parse;
   case NEED_DOT:
     CHECK('.' == *val);

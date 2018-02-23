@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
         PANIC;
       parseRowAndCol(buf, &baseInfo.task);
       findPlants(fuck_LilyPad_Pumpkin);
-      destroy((void **)&baseInfo.task, NULL);
+      destroy((__list **)&baseInfo.task, NULL);
     } break;
     case 13:
       findPlants(plants_freeze);
