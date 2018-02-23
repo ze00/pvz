@@ -1,5 +1,5 @@
 #!/system/bin/sh
-version=$(getprop ro.build.version.release)
+version=$(/system/bin/getprop ro.build.version.release)
 
 if [ "${version%%.*}" -gt "6" ];then
   if [ -d "/system/lib64" ];then
