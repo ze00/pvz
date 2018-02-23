@@ -70,11 +70,11 @@ void getBaseAndEnd(void *buf, void __unused *base, void __unused *end) {
   // 不知道为什么这条代码会出问题
   insert_heaps(&baseInfo.heap, f, g);
 }
-int *getHeapBase() {
+void getHeapBase() {
 #ifdef NOUGHT
-  return (int *)getBase("[anon:libc_malloc]", 0, getBaseAndEnd, NULL);
+  getBase("[anon:libc_malloc]", 0, getBaseAndEnd, NULL);
 #else
-  return (int *)getBase("[heap]", 0, getBaseAndEnd, NULL);
+  getBase("[heap]", 0, getBaseAndEnd, NULL);
 #endif
 }
 
