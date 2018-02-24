@@ -129,7 +129,7 @@ void forEach(void *(entry)(void *), void (*op)(void *, void *)) {
     // 可能会由于编译器的问题
     // 每次进入while内
     // 创建的arg都是同一个地址
-    struct thread_arg *arg = malloc(sizeof(thread_arg));
+    thread_arg *arg = malloc(sizeof(thread_arg));
     arg->heap = heap;
     arg->callable = op;
     pthread_create(&id, NULL, entry, arg);
@@ -143,7 +143,7 @@ void forEach(void *(entry)(void *), void (*op)(void *, void *)) {
   pthread_mutex_destroy(&mutex);
 }
 #define init()                                                                 \
-  struct thread_arg *arg = my_arg;                                             \
+  thread_arg *arg = my_arg;                                                    \
   __heaps *heap = arg->heap;                                                   \
   char *buf = heap->buf;
 
