@@ -98,25 +98,6 @@ void removeColdDown() {
     p -= 9;
   }
 }
-void findZombies(void (*op)(void *, void *)) {
-  __heaps *heap = baseInfo.heap;
-  while (heap != NULL) {
-    char *buf = heap->buf;
-    pvz_read(heap->base, buf, heap->heap_size);
-    size_t maxIndex = heap->heap_size - ZOM_HP_OFF;
-    int32_t *helper;
-    for (size_t i = 0; i < maxIndex; ++i) {
-      helper = (int32_t *)buf;
-      if (helper[0] == 0xffffffff && helper[1] == 0x0 &&
-          helper[2] == 0xffffffff && helper[3] == 0xffffffff &&
-          helper[4] == 0) {
-        op(helper, heap->base + i);
-      }
-      ++buf;
-    }
-    heap = next(heap);
-  }
-}
 void letZombiesFragile(void *dp, void *rp) {
   memcpy(&Hp, (char *)dp + ZOM_HP_OFF, sizeof(Hp));
   if (Hp.curHp != 10 && IN_RANGE(Hp.totalHp, 270, 6000)) {
@@ -138,25 +119,91 @@ void increaseCabbagePult() {
   int32_t v = 45;
   pvz_write(p + 8, &v, sizeof(v));
 }
-void findPlants(void (*op)(void *, void *)) {
+void forEach(void *(entry)(void *), void (*op)(void *, void *)) {
   __heaps *heap = baseInfo.heap;
+  thread_ids *ids = NULL;
+  pthread_t id;
+  pthread_mutex_init(&mutex, NULL);
   while (heap != NULL) {
-    char *buf = heap->buf;
-    pvz_read(heap->base, buf, heap->heap_size);
-    size_t maxIndex = heap->heap_size - PLAN_HP_TOTAL_OFF;
-    int32_t *helper;
-    for (size_t i = 0; i < maxIndex; ++i) {
-      helper = (int32_t *)buf;
-      if (helper[0] == 0x43200000 && helper[1] == 0x42200000 &&
-          helper[2] == 1 &&
-          IN_RANGE(helper[PLAN_HP_TOTAL_OFF / sizeof(int32_t)], 300, 8000)) {
-        op(helper, heap->base + i);
-      }
-      ++buf;
-    }
+    // 此处使用malloc而不使用一个局部对象
+    // 可能会由于编译器的问题
+    // 每次进入while内
+    // 创建的arg都是同一个地址
+    struct thread_arg *arg = malloc(sizeof(thread_arg));
+    arg->heap = heap;
+    arg->callable = op;
+    pthread_create(&id, NULL, entry, arg);
+    // pthread_detach(id);
+    insert_thread_ids(&ids, id);
     heap = next(heap);
   }
+  // FIXME:如果有线程被中断
+  // 则内存泄露
+  destroy_thread_ids(&ids);
+  pthread_mutex_destroy(&mutex);
 }
+#define init()                                                                 \
+  struct thread_arg *arg = my_arg;                                             \
+  __heaps *heap = arg->heap;                                                   \
+  char *buf = heap->buf;
+
+// 此处需要使用pthread_mutex_lock
+// 一个进程不能同时被ptrace
+#define read()                                                                 \
+  pthread_mutex_lock(&mutex);                                                  \
+  pvz_read(heap->base, buf, heap->heap_size);                                  \
+  pthread_mutex_unlock(&mutex);
+
+// arg->callable可能会使用pvz_write
+#define call()                                                                 \
+  pthread_mutex_lock(&mutex);                                                  \
+  arg->callable(helper, heap->base + i);                                       \
+  pthread_mutex_unlock(&mutex);
+
+#define exit()                                                                 \
+  free(arg);                                                                   \
+  pthread_exit(NULL);
+
+void *forEachPlants_child(void *my_arg) {
+  init();
+  read();
+  size_t maxIndex = heap->heap_size - PLAN_HP_TOTAL_OFF;
+  int32_t *helper;
+  for (size_t i = 0; i < maxIndex; ++i) {
+    helper = (int32_t *)buf;
+    if (helper[0] == 0x43200000 && helper[1] == 0x42200000 && helper[2] == 1 &&
+        IN_RANGE(helper[PLAN_HP_TOTAL_OFF / sizeof(int32_t)], 300, 8000)) {
+      call();
+    }
+    ++buf;
+  }
+  exit()
+}
+void forEachPlants(void (*op)(void *, void *)) {
+  forEach(forEachPlants_child, op);
+}
+void *forEachZombies_child(void *my_arg) {
+  init();
+  read();
+  size_t maxIndex = heap->heap_size - ZOM_HP_OFF;
+  int32_t *helper;
+  for (size_t i = 0; i < maxIndex; ++i) {
+    helper = (int32_t *)buf;
+    if (helper[0] == 0xffffffff && helper[1] == 0x0 &&
+        helper[2] == 0xffffffff && helper[3] == 0xffffffff && helper[4] == 0) {
+      call();
+    }
+    ++buf;
+  }
+  exit();
+}
+void forEachZombies(void (*op)(void *, void *)) {
+  forEach(forEachZombies_child, op);
+}
+#undef init
+#undef read
+#undef call
+#undef exit
 void report(void *__unused __, void *p) { printf("Found at %p\n", p); }
 void increasePlants(void *dp, void *rp) {
   baseInfo.val = (*(int32_t *)((char *)dp + PLAN_HP_OFF)) * 2;

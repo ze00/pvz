@@ -9,6 +9,7 @@
 #ifndef __UTILS__H
 #define __UTILS__H
 #include <stdint.h>
+#include <pthread.h>
 #include "defs.h"
 #define PANIC                                                                  \
   do {                                                                         \
@@ -36,9 +37,18 @@ typedef struct __heaps {
   char *buf;
   size_t heap_size;
 } __heaps;
-
+typedef struct thread_ids {
+  __list list;
+  pthread_t id;
+} thread_ids;
+typedef struct thread_arg {
+  pthread_t id;
+  __heaps *heap;
+  void (*callable)(void *, void *);
+} thread_arg;
 #define next(x) ((x)->list.next)
 #define real(x) ((x)->list.real)
+#define back(x) ((__typeof__((x)))(x)->list.real)
 extern void pop(__task **);
 extern int has(__task *, int, int);
 extern void insert_images(__images **, int, void *);
@@ -47,6 +57,8 @@ extern void insert_heaps(__heaps **, char *, char *);
 extern void destroy_heaps(__heaps **);
 extern void destroy(__list **, void (*)(void *));
 extern void *insert(__list **, size_t);
+extern void insert_thread_ids(thread_ids **, pthread_t);
+extern void destroy_thread_ids(thread_ids **);
 extern void parseRowAndCol(const char *, __task **);
 extern void checkRootState();
 extern pid_t findPVZProcess(ProcessDIR);

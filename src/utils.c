@@ -71,8 +71,8 @@ void recover_images(__images *node) {
     node = next(node);
   }
 }
-void insert_heaps(__heaps **heap, char *base, char *end) {
-  __heaps *node = insert((__list **)heap, sizeof(__heaps));
+void insert_heaps(__heaps **target, char *base, char *end) {
+  __heaps *node = insert((__list **)target, sizeof(__heaps));
   node->base = base;
   node->end = end;
   node->heap_size = end - base;
@@ -88,6 +88,18 @@ void insert_heaps(__heaps **heap, char *base, char *end) {
 void free_buf(__heaps *heap) { free(heap->buf); }
 void destroy_heaps(__heaps **node) {
   destroy((__list **)node, (void (*)(void *))free_buf);
+}
+void insert_thread_ids(thread_ids **ids, pthread_t id) {
+  thread_ids *node = insert((__list **)ids, sizeof(thread_ids));
+  node->id = id;
+}
+void destroy_thread_ids(thread_ids **ids) {
+  thread_ids *id = *ids;
+  while (id != NULL) {
+    pthread_join(id->id, NULL);
+    id = next(id);
+  }
+  destroy((__list **)ids, NULL);
 }
 void parseRowAndCol(const char *buf, __task **task) {
   const char *val = buf;

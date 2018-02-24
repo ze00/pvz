@@ -3,7 +3,7 @@ MODULE := \
 	elfreader \
 	cheater
 inc := $(shell find inc)
-CC_FLAG := -g -Iinc -Wall -std=c99
+CC_FLAG := -g -Iinc -Wall -std=c99 -pthread
 CC_FLAG += -DHAVE_PROCMEM -DDEBUG
 ifeq ($(NDK_BUILD),true)
   NDK ?= $(HOME)/android-ndk-r14b

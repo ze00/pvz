@@ -10,6 +10,7 @@
 #ifndef __PVZ__H
 #define __PVZ__H
 #include <sys/cdefs.h>
+#include <pthread.h>
 #include <setjmp.h>
 #ifndef SPECIFIC_PACKAGE
 #define SPECIFIC_PACKAGE "com.popcap.pvz_na"
@@ -33,4 +34,5 @@ struct {
   size_t armor;
 } newHp;
 jmp_buf env;
+pthread_mutex_t mutex;
 #endif //__PVZ__H

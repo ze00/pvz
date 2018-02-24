@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <setjmp.h>
 #include <strings.h>
+#include <time.h>
 #include "defs.h"
 #include "utils.h"
 #include "base.h"
@@ -61,7 +62,7 @@ int main(int argc, char **argv) {
       break;
     case 2:
       while (1) {
-        findZombies(letZombiesFragile);
+        forEachZombies(letZombiesFragile);
         usleep(WAIT_USECONDS);
       }
       break;
@@ -72,22 +73,22 @@ int main(int argc, char **argv) {
       removeColdDown();
       break;
     case 5:
-      findZombies(coverZombies);
+      forEachZombies(coverZombies);
       break;
     case 6:
-      findZombies(increaseZombies);
+      forEachZombies(increaseZombies);
       break;
     case 7:
-      findPlants(reportPlants);
+      forEachPlants(reportPlants);
       break;
     case 8:
-      findZombies(report);
+      forEachZombies(report);
       break;
     case 9:
-      findPlants(increasePlants);
+      forEachPlants(increasePlants);
       break;
     case 10:
-      findPlants(increasePlantsAttack);
+      forEachPlants(increasePlantsAttack);
       break;
     case 11: {
       printf("要将梯子僵尸放于何列?\n例如:1.2,1.3,(行与列以英文句号分隔,"
@@ -97,7 +98,7 @@ int main(int argc, char **argv) {
         PANIC;
       parseRowAndCol(buf, &baseInfo.task);
       while (baseInfo.task != NULL) {
-        findZombies(putLadder);
+        forEachZombies(putLadder);
         usleep(WAIT_USECONDS);
       }
       real(baseInfo.task) = NULL;
@@ -109,14 +110,14 @@ int main(int argc, char **argv) {
       if (fgets(buf, sizeof(buf), stdin) == NULL)
         PANIC;
       parseRowAndCol(buf, &baseInfo.task);
-      findPlants(fuck_LilyPad_Pumpkin);
+      forEachPlants(fuck_LilyPad_Pumpkin);
       destroy((__list **)&baseInfo.task, NULL);
     } break;
     case 13:
-      findPlants(plants_freeze);
+      forEachPlants(plants_freeze);
       break;
     case 14:
-      findPlants(plants_attack);
+      forEachPlants(plants_attack);
       break;
     case 15:
       destroy_heaps(&baseInfo.heap);
@@ -128,3 +129,4 @@ int main(int argc, char **argv) {
   destroy_heaps(&baseInfo.heap);
   return 0;
 }
+#undef GETOPT
