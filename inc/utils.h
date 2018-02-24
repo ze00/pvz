@@ -42,7 +42,6 @@ typedef struct thread_ids {
   pthread_t id;
 } thread_ids;
 typedef struct thread_arg {
-  pthread_t id;
   __heaps *heap;
   void (*callable)(void *, void *);
 } thread_arg;
