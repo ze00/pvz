@@ -12,7 +12,6 @@
 #include <unistd.h>
 #include <setjmp.h>
 #include <strings.h>
-#include <time.h>
 #include "defs.h"
 #include "utils.h"
 #include "base.h"
