@@ -96,6 +96,11 @@ void insert_thread_ids(thread_ids **ids, pthread_t id) {
 void destroy_thread_ids(thread_ids **ids) {
   thread_ids *id = *ids;
   while (id != NULL) {
+    // 等待线程退出
+    // 或许也必须pthread_join
+    // 应该再所有线程都退出后再回到游戏
+    // 否则ptrace时回到游戏
+    // 游戏已经被暂停了
     pthread_join(id->id, NULL);
     id = next(id);
   }

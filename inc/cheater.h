@@ -38,7 +38,7 @@ void *getBase(const char *spec, int findFirst,
   while (fgets(buf, BUFSIZE, maps) != NULL) {
     if (strstr(buf, spec)) {
       if (action == NULL)
-        sscanf(buf, "%8x", (intptr_t *)&base);
+        sscanf(buf, "%8x", (unsigned int *)&base);
       else
         action(buf, &base, end);
       if (findFirst)
@@ -82,7 +82,7 @@ void changeCoins() {
   hp = buf;
   off_t off;
   for (off = 0; off < sizeof(buf); ++off) {
-    if (*(int32_t *)hp == (int32_t)helper) {
+    if (*(intptr_t *)hp == (intptr_t)helper) {
       break;
     }
     hp++;

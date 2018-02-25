@@ -24,14 +24,41 @@ struct pvz_offset {
 };
 // 辅助地址-0xfd2060
 struct pvz_offset pvz_off_tbl[] = {
-    {"coins", -0xfd2060},     {"gargantuar", 0xc4c6c4},
-    {"cabbage", 0xc44460},    {"cannon", 0xc4467c},
-    {"zombies_type", -0x50},  {"zombies_pos_x", -0x48},
-    {"zombies_pos_y", -0x44}, {"zombies_row", -0x64},
-    {"zombies_fly", 0x44},    {"zombies_hp", 0x54},
-    {"plants_col", 0x10},     {"plants_vis", -0xc},
-    {"plants_row", -0x8},     {"plants_type", 0xc},
-    {"plants_hp", 0x28},      {"plants_attack", 0x30},
+    // 金币的辅助地址
+    // 真正的金币地址需要这个辅助地址来计算得出
+    // 但在不同的手机上可能找不到真正的金币地址
+    {"coins", -0xfd2060},
+    // 卷心菜头手的射速
+    {"cabbage", 0xc44460},
+    // 炮的冷却偏移
+    {"cannon", 0xc4467c},
+    // 僵尸类型代码
+    {"zombies_type", -0x50},
+    // 僵尸x坐标
+    // 相对于格子的坐标
+    {"zombies_pos_x", -0x48},
+    // 僵尸y坐标
+    {"zombies_pos_y", -0x44},
+    // 僵尸的行
+    {"zombies_row", -0x64},
+    // 是否飞回家
+    {"zombies_back", 0x44},
+    // 僵尸雪亮
+    {"zombies_hp", 0x54},
+    // 植物的列
+    {"plants_col", 0x10},
+    // 植物是否可见
+    {"plants_vis", -0xc},
+    // 植物的行
+    {"plants_row", -0x8},
+    // 植物类型代码
+    {"plants_type", 0xc},
+    // 植物血量
+    {"plants_hp", 0x28},
+    // 植物攻击力
+    {"plants_attack", 0x30},
+    // 场景特效代码的偏移
+    {"field_effect_code", 0x2e7d8},
 };
 off_t getOffset(const char *name) {
   off_t off = -1;
