@@ -18,26 +18,20 @@
 #define PLAN_ATT_TOTAL_OFF 0x44
 #define PLAN_PEA_ATT_OFF 0x78
 #define PLAN_STATUS_OFF 0xa8
-enum off_type {
-  OFF_MISC,
-  OFF_PLANTS,
-  OFF_ZOMBIES,
-};
 struct pvz_offset {
   const char *name;
-  enum off_type type;
   off_t offset;
 };
 // 辅助地址-0xfd2060
 struct pvz_offset pvz_off_tbl[] = {
-    {"coins", OFF_MISC, -0xfd2060},     {"gargantuar", OFF_ZOMBIES, 0xc4c6c4},
-    {"cabbage", OFF_PLANTS, 0xc44460},  {"cannon", OFF_PLANTS, 0xc4467c},
-    {"zombies_type", OFF_MISC, -0x50},  {"zombies_pos_x", OFF_MISC, -0x48},
-    {"zombies_pos_y", OFF_MISC, -0x44}, {"zombies_row", OFF_MISC, -0x64},
-    {"zombies_fly", OFF_MISC, 0x44},    {"zombies_hp", OFF_MISC, 0x54},
-    {"plants_col", OFF_MISC, 0x10},     {"plants_vis", OFF_MISC, -0xc},
-    {"plants_row", OFF_MISC, -0x8},     {"plants_type", OFF_MISC, 0xc},
-    {"plants_hp", OFF_MISC, 0x28},      {"plants_attack", OFF_MISC, 0x30},
+    {"coins", -0xfd2060},     {"gargantuar", 0xc4c6c4},
+    {"cabbage", 0xc44460},    {"cannon", 0xc4467c},
+    {"zombies_type", -0x50},  {"zombies_pos_x", -0x48},
+    {"zombies_pos_y", -0x44}, {"zombies_row", -0x64},
+    {"zombies_fly", 0x44},    {"zombies_hp", 0x54},
+    {"plants_col", 0x10},     {"plants_vis", -0xc},
+    {"plants_row", -0x8},     {"plants_type", 0xc},
+    {"plants_hp", 0x28},      {"plants_attack", 0x30},
 };
 off_t getOffset(const char *name) {
   off_t off = -1;
