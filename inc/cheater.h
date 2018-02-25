@@ -277,7 +277,6 @@ void catchSIGINT() {
   fflush(stdout);
   setbuf(stdin, NULL);
   destroy((__list **)&baseInfo.task, NULL);
-  destroy_heaps(&baseInfo.heap);
   longjmp(env, SETJMP_RET);
 }
 void registeSigHandle() { signal(SIGINT, catchSIGINT); }

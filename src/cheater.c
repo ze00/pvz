@@ -100,7 +100,6 @@ int main(int argc, char **argv) {
         forEachZombies(putLadder);
         usleep(WAIT_USECONDS);
       }
-      real(baseInfo.task) = NULL;
     } break;
     case 12: {
       printf("要去除何处的莲叶或破坏何处的南瓜?(行与列以英文句号分隔,"
