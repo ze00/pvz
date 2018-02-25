@@ -2,7 +2,7 @@
 version=$(/system/bin/getprop ro.build.version.release)
 
 if [ -d "/system/lib64" ];then
-  arch="arm64"
+  arch="aarch64"
 else
   arch="arm"
 fi

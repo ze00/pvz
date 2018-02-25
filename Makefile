@@ -39,8 +39,8 @@ endef
 release:
 	$(call make_release,NOUGHT=true,arm/cheater_nought)
 	$(call make_release,,arm/cheater_marshmallow)
-	$(call make_release,NOUGHT=true ARM64=true,arm64/cheater_nought)
-	$(call make_release,ARM64=true,arm64/cheater_marshmallow)
+	$(call make_release,NOUGHT=true ARM64=true,aarch64/cheater_nought)
+	$(call make_release,ARM64=true,aarch64/cheater_marshmallow)
 .PHONY:clean
 clean:
 	-@ rm -rf $(MODULE)
