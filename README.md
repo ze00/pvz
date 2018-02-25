@@ -3,7 +3,8 @@
     ![pvz](doc/pvz.png)
   * 需要Root权限
 ## 使用步骤
-  * 获取一个北美版的植物大战僵尸
+  * **获取一个北美版的植物大战僵尸**
+
     目前可能必须要使用我提供的pvz主程序，否则不保证功能能够正常使用
 
     本人所使用的北美版:链接: https://pan.baidu.com/s/1d1T0K2 密码: y98i
@@ -13,6 +14,7 @@
     具体安装教程:http://lonelystar.org/ResDownload/1_Android_Na.htm
 
   * 1.**使用直装版的修改器**
+
     ** 链接: https://pan.baidu.com/s/1kWUH3Kj 密码: 4hby **
 
     基于NeoTerm(https://github.com/NeoTerm/NeoTerm)
@@ -25,7 +27,9 @@
     ![neoterm_first_run](doc/neoterm_first_run.png)
     ![neoterm_installing_component](doc/neoterm_installing_component.png)
   * 获取修改器程序
+
     打开你安装的NeoTerm
+
     然后输入:
     ```
     apt install curl
@@ -34,11 +38,13 @@
     ![neoterm_installing_curl](doc/neoterm_installing_curl.png)
     ![neoterm_installing_cheater](doc/neoterm_installing_cheater.png)
   * 运行修改器程序
+
     在NeoTerm内输入:
     ```
     su
     ```
     如果您已获取Root权限，则您的Root权限管理器会提示是否允许'NeoTerm使用Root权限'，点击允许即可
+
     与此同时，NeoTerm也将会变成类似于下图这样的提示
     ![neoterm_obtain_root](doc/neoterm_obtain_root.png)
 
