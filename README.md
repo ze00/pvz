@@ -15,7 +15,7 @@
 
   * 1.**使用直装版的修改器**
 
-    ** 链接: https://pan.baidu.com/s/1kWUH3Kj 密码: 4hby **
+    链接: https://pan.baidu.com/s/1kWUH3Kj 密码: 4hby
 
     基于NeoTerm(https://github.com/NeoTerm/NeoTerm)
 
@@ -23,6 +23,7 @@
   * 2.**使用面向Linux高手的修改器**
   * 安装NeoTerm
     https://www.coolapk.com/apk/io.neoterm
+
     安装完之后第一次打开将会下载几mb的东西，安装即可
     ![neoterm_first_run](doc/neoterm_first_run.png)
     ![neoterm_installing_component](doc/neoterm_installing_component.png)
