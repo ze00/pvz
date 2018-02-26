@@ -204,7 +204,18 @@ void forEachZombies(void (*op)(void *, void *)) {
 #undef read
 #undef call
 #undef exit
-void report(void *__unused __, void *p) { printf("Found at %p\n", p); }
+#define ROW(lp) (*INTP(lp + getOffset("zombies_row")) + 1)
+#define COL(lp) (*(float *)(lp + getOffset("zombies_pos_y")))
+#define HP(lp) (*INTP(lp + ZOM_HP_OFF))
+#define CODE(lp) (*INTP(lp + getOffset("zombies_type")))
+void reportZombies(void *local, void *rp) {
+  printf("Found at %p (row@%d x pos_y@%f)(hp:%d code:%d)\n", rp, ROW(local),
+         COL(local), HP(local), CODE(local));
+}
+#undef ROW
+#undef COL
+#undef HP
+#undef CODE
 void increasePlants(void *dp, void *rp) {
   baseInfo.val = (*(int32_t *)((char *)dp + PLAN_HP_OFF)) * 2;
   pvz_write((char *)rp + PLAN_HP_OFF, &baseInfo.val, sizeof(baseInfo.val));
@@ -273,6 +284,7 @@ void plants_attack(void *local, void *remote) {
 #undef COL
 #undef HP
 #undef CODE
+#undef ATTACK
 void catchSIGINT() {
   fflush(stdout);
   setbuf(stdin, NULL);

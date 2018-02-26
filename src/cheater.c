@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
   if (baseInfo.heap == NULL) {
     printf("Failed to get heap base,please restart the game!\n");
   }
-  printf("Dynamic base %p\n", baseInfo.base);
   int option;
   BufferType buf;
   registeSigHandle();
@@ -81,7 +80,7 @@ int main(int argc, char **argv) {
       forEachPlants(reportPlants);
       break;
     case 8:
-      forEachZombies(report);
+      forEachZombies(reportZombies);
       break;
     case 9:
       forEachPlants(increasePlants);

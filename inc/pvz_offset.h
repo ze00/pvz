@@ -32,6 +32,8 @@ struct pvz_offset pvz_off_tbl[] = {
     {"cabbage", 0xc44460},
     // 炮的冷却偏移
     {"cannon", 0xc4467c},
+    // 僵尸首地址
+    {"zombies_base", -0x80},
     // 僵尸类型代码
     {"zombies_type", -0x50},
     // 僵尸x坐标
@@ -59,6 +61,11 @@ struct pvz_offset pvz_off_tbl[] = {
     {"plants_attack", 0x30},
     // 场景特效代码的偏移
     {"field_effect_code", 0x2e7d8},
+    // FIXME:以下两个偏移是动态的
+    // 场景
+    {"field_code", 0x78aa40},
+    // 冒险关卡进度
+    {"adventure_progress", 0x78aa44},
 };
 off_t getOffset(const char *name) {
   off_t off = -1;
