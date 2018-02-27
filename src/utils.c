@@ -21,11 +21,11 @@ void *insert(__list **target, size_t len) {
   node->next = NULL;
   if (*target == NULL) {
     *target = node;
-    (*target)->real = node;
   } else {
+    // real是当前链表的尾节点
     ((__list *)(*target)->real)->next = node;
-    (*target)->real = node;
   }
+  (*target)->real = node;
   return node;
 }
 void destroy(__list **node, void (*op)(void *)) {
@@ -37,8 +37,6 @@ void destroy(__list **node, void (*op)(void *)) {
     free(*node);
     *node = helper;
   }
-  if (*node != NULL)
-    (*node)->real = NULL;
   *node = NULL;
 }
 void insert_task(__task **target, int row, int col) {
@@ -59,15 +57,15 @@ int has(__task *target, int row, int col) {
   }
   return 0;
 }
-void insert_images(__images **target, int attack, void *remote) {
+void insert_images(__images **target, int value, void *remote) {
   __images *node = insert((__list **)target, sizeof(__images));
-  node->attack = attack;
+  node->value = value;
   node->remote = remote;
 }
 void recover_images(__images *node) {
   while (node != NULL) {
     extern void pvz_write(void *, void *, size_t);
-    pvz_write(node->remote, &node->attack, sizeof(node->attack));
+    pvz_write(node->remote, &node->value, sizeof(node->value));
     node = next(node);
   }
 }
@@ -170,28 +168,30 @@ void checkRootState() {
     exit(-1);
   }
 }
-int isReadable(Path path) { return access(path, R_OK) == 0; }
-pid_t findPVZProcess(ProcessDIR processDIR) {
-  DIR *dp = opendir("/proc");
+int isReadable(const Path path) { return access(path, R_OK) == 0; }
+const char *readline(const char *file) {
+  static BufferType buf;
   FILE *fp;
+  if (isReadable(file)) {
+    fp = fopen(file, "r");
+    fgets(buf, BUFSIZE, fp);
+    fclose(fp);
+  }
+  return buf;
+}
+pid_t findPVZProcess() {
+  DIR *dp = opendir("/proc");
   struct dirent *dirHandle;
   pid_t pid = -1;
   Path packageNameProvider;
-  BufferType buf;
   while ((dirHandle = readdir(dp))) {
     // 文件名第一个字符是数字
     if (dirHandle->d_type & DT_DIR && isdigit(*dirHandle->d_name)) {
-      sprintf(processDIR, "/proc/%s", dirHandle->d_name);
-      sprintf(packageNameProvider, "%s/cmdline", processDIR);
-      if (isReadable(packageNameProvider)) {
-        fp = fopen(packageNameProvider, "r");
-        fgets(buf, BUFSIZE, fp);
-        if (strcmp(buf, SPECIFIC_PACKAGE) == 0) {
-          pid = atoi(dirHandle->d_name);
-          fclose(fp);
-          break;
-        }
-        fclose(fp);
+      sprintf(packageNameProvider, "/proc/%s/cmdline", dirHandle->d_name);
+      if (strncmp(readline(packageNameProvider), SPECIFIC_PACKAGE,
+                  strlen(SPECIFIC_PACKAGE)) == 0) {
+        pid = atoi(dirHandle->d_name);
+        break;
       }
     }
   }

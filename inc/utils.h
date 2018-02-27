@@ -27,7 +27,7 @@ typedef struct __task {
 } __task;
 typedef struct __images {
   __list list;
-  int32_t attack;
+  int32_t value;
   void *remote;
 } __images;
 typedef struct __heaps {
@@ -60,5 +60,5 @@ extern void insert_thread_ids(thread_ids **, pthread_t);
 extern void destroy_thread_ids(thread_ids **);
 extern void parseRowAndCol(const char *, __task **);
 extern void checkRootState();
-extern pid_t findPVZProcess(ProcessDIR);
+extern pid_t findPVZProcess();
 #endif //__UTILS__H

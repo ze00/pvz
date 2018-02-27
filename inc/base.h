@@ -20,7 +20,6 @@ struct {
   __heaps *heap;
   int32_t val;
   pid_t pid;
-  ProcessDIR processDIR;
   __task *task;
   __images *images;
 } baseInfo;

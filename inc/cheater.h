@@ -32,7 +32,7 @@ void *getBase(const char *spec, int findFirst,
               void (*action)(void *, void *, void *), void *end) {
   void *base;
   Path vmMaps;
-  sprintf(vmMaps, "%s/maps", baseInfo.processDIR);
+  sprintf(vmMaps, "/proc/%d/maps", baseInfo.pid);
   FILE *maps = fopen(vmMaps, "r");
   BufferType buf;
   while (fgets(buf, BUFSIZE, maps) != NULL) {
@@ -49,7 +49,7 @@ void *getBase(const char *spec, int findFirst,
   return base;
 }
 void *getDynamicBase() {
-  pid_t pid = findPVZProcess(baseInfo.processDIR);
+  pid_t pid = findPVZProcess();
   if (pid == -1) {
     printf("cannot locate '%s'\n", SPECIFIC_PACKAGE);
     exit(-1);
