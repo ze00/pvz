@@ -142,7 +142,9 @@ parse:
     col = DIGIT();
     status = NEED_COMMA;
     val++;
-    insert_task(task, row, col);
+    // 不允许重复
+    if(!has(task, row, col))
+      insert_task(task, row, col);
     goto parse;
   case NEED_DOT:
     CHECK('.' == *val);
