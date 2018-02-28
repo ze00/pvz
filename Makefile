@@ -23,9 +23,6 @@ else
 	CC := gcc
 	STRIP := strip
 endif
-ifeq ($(NOUGHT),true)
- CC_FLAG += -DNOUGHT
-endif
 all:$(MODULE)
 $(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))
 cheater_src += ptrace.c src/utils.c
@@ -37,10 +34,8 @@ define make_release
 endef
 .PHONY:release
 release:
-	$(call make_release,NOUGHT=true,arm/cheater_nought)
-	$(call make_release,,arm/cheater_marshmallow)
-	$(call make_release,NOUGHT=true ARM64=true,aarch64/cheater_nought)
-	$(call make_release,ARM64=true,aarch64/cheater_marshmallow)
+	$(call make_release,,arm/cheater)
+	$(call make_release,ARM64=true,aarch64/cheater)
 .PHONY:clean
 clean:
 	-@ rm -rf $(MODULE)

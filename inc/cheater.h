@@ -66,11 +66,9 @@ void getBaseAndEnd(const char *buf, void __unused *base, void __unused *end) {
   insert_heaps(&baseInfo.heap, f, g);
 }
 void getHeapBase() {
-#ifdef NOUGHT
+  // 见kernel/Documentation/filesystems/proc.txt
   getBase("[anon:libc_malloc]", 0, getBaseAndEnd, NULL);
-#else
   getBase("[heap]", 0, getBaseAndEnd, NULL);
-#endif
 }
 
 void changeCoins() {
@@ -204,10 +202,10 @@ void forEachZombies(void (*op)(void *, void *)) {
 #undef read
 #undef call
 #undef exit
-#define ROW(lp) (*INTP(lp + getOffset("zombies_row")) + 1)
+#define ROW(lp) (*INT32P(lp + getOffset("zombies_row")) + 1)
 #define COL(lp) (*(float *)(lp + getOffset("zombies_pos_y")))
-#define HP(lp) (*INTP(lp + ZOM_HP_OFF))
-#define CODE(lp) (*INTP(lp + getOffset("zombies_type")))
+#define HP(lp) (*INT32P(lp + ZOM_HP_OFF))
+#define CODE(lp) (*INT32P(lp + getOffset("zombies_type")))
 void reportZombies(void *local, void *rp) {
   printf("Found at %p (row@%d x pos_y@%f)(hp:%d code:%d)\n", rp, ROW(local),
          COL(local), HP(local), CODE(local));
@@ -243,11 +241,11 @@ void putLadder(void *local, void *remote) {
     }
   }
 }
-#define ROW(lp) (*INTP(lp + getOffset("plants_row")) + 1)
-#define COL(lp) (*INTP(lp + getOffset("plants_col")) + 1)
-#define HP(lp) (*INTP(lp + PLAN_HP_OFF))
-#define CODE(lp) (*INTP(lp + getOffset("plants_type")))
-#define ATTACK(lp) (*INTP(lp + getOffset("plants_attack")))
+#define ROW(lp) (*INT32P(lp + getOffset("plants_row")) + 1)
+#define COL(lp) (*INT32P(lp + getOffset("plants_col")) + 1)
+#define HP(lp) (*INT32P(lp + PLAN_HP_OFF))
+#define CODE(lp) (*INT32P(lp + getOffset("plants_type")))
+#define ATTACK(lp) (*INT32P(lp + getOffset("plants_attack")))
 void reportPlants(void *plant, void *rp) {
   printf("Found at %p (row@%d x col@%d)(hp:%d code:%d)\n", rp, ROW(plant),
          COL(plant), HP(plant), CODE(plant));
