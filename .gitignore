@@ -1,6 +1,5 @@
-cheater
-patcher
-elfreader
+/cheater
+/patcher
+/elfreader
 *.gch
 lib
-!release/*
