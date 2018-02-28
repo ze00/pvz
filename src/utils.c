@@ -80,7 +80,8 @@ void insert_heaps(__heaps **target, char *base, char *end) {
   // insert那里malloc基本不可能失败
   node->buf = malloc(node->heap_size);
   if (node->buf == NULL) {
-    printf("Cannt allocate '%zu' byte memory...\n", node->heap_size);
+    printf("Cannt allocate '%zu' byte memory...this may is a bug!please contract developer.\n", node->heap_size);
+    exit(1);
   }
 }
 void free_buf(__heaps *heap) { free(heap->buf); }
