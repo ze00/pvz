@@ -7,11 +7,11 @@
  * Module  :
  */
 #include <stdio.h>
-#include <stdlib.h>
-#include <dirent.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <dirent.h>
 #include <unistd.h>
-#include <signal.h>
 #include "defs.h"
 #include "scanmem.h"
 #include "pvz.h"
@@ -143,7 +143,7 @@ parse:
     status = NEED_COMMA;
     val++;
     // 不允许重复
-    if(!has(task, row, col))
+    if (!has(*task, row, col))
       insert_task(task, row, col);
     goto parse;
   case NEED_DOT:
@@ -170,15 +170,11 @@ void checkRootState() {
     exit(-1);
   }
 }
-int isReadable(const Path path) { return access(path, R_OK) == 0; }
-const char *readline(const char *file) {
+const char *readline(const Path file) {
   static BufferType buf;
-  FILE *fp;
-  if (isReadable(file)) {
-    fp = fopen(file, "r");
-    fgets(buf, BUFSIZE, fp);
-    fclose(fp);
-  }
+  FILE *fp = fopen(file, "r");
+  fgets(buf, BUFSIZE, fp);
+  fclose(fp);
   return buf;
 }
 pid_t findPVZProcess() {

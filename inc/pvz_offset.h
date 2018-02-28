@@ -34,6 +34,10 @@ struct pvz_offset pvz_off_tbl[] = {
     {"cannon", 0xc4467c},
     // 僵尸首地址
     {"zombies_base", -0x80},
+    // 以下两个于.bbs
+    // 所有僵尸
+    {"zombies_list", 0x8364c},
+    {"zombies_count", 0xc090},
     // 僵尸类型代码
     {"zombies_type", -0x50},
     // 僵尸x坐标

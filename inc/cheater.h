@@ -29,7 +29,7 @@ void pvz_read(void *rp, void *buf, size_t len) {
   }
 }
 void *getBase(const char *spec, int findFirst,
-              void (*action)(void *, void *, void *), void *end) {
+              void (*action)(const char *, void *, void *), void *end) {
   void *base;
   Path vmMaps;
   sprintf(vmMaps, "/proc/%d/maps", baseInfo.pid);
@@ -58,7 +58,7 @@ void *getDynamicBase() {
   baseInfo.pid = pid;
   return getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, NULL);
 }
-void getBaseAndEnd(void *buf, void __unused *base, void __unused *end) {
+void getBaseAndEnd(const char *buf, void __unused *base, void __unused *end) {
   void *f, *g;
   sscanf(buf, "%8x-%8x", INTP(&f), INTP(&g));
   // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
