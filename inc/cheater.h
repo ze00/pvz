@@ -38,7 +38,7 @@ void *getBase(const char *spec, int findFirst,
   while (fgets(buf, BUFSIZE, maps) != NULL) {
     if (strstr(buf, spec)) {
       if (action == NULL)
-        sscanf(buf, "%8x", (unsigned int *)&base);
+        sscanf(buf, "%x", (unsigned int *)&base);
       else
         action(buf, &base, end);
       if (findFirst)
@@ -60,7 +60,7 @@ void *getDynamicBase() {
 }
 void getBaseAndEnd(const char *buf, void __unused *base, void __unused *end) {
   void *f, *g;
-  sscanf(buf, "%8x-%8x", INTP(&f), INTP(&g));
+  sscanf(buf, "%x-%x", INTP(&f), INTP(&g));
   // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
   // 不知道为什么这条代码会出问题
   insert_heaps(&baseInfo.heap, f, g);
