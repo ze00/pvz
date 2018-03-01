@@ -175,7 +175,7 @@ void *forEachPlants_child(void *my_arg) {
     }
     ++buf;
   }
-  exit()
+  exit();
 }
 void forEachPlants(void (*op)(void *, void *)) {
   forEach(forEachPlants_child, op);

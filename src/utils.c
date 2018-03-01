@@ -69,6 +69,10 @@ void recover_images(__images *node) {
     node = next(node);
   }
 }
+void free_buf(__heaps *heap) { free(heap->buf); }
+void destroy_heaps(__heaps **node) {
+  destroy((__list **)node, (void (*)(void *))free_buf);
+}
 void insert_heaps(__heaps **target, char *base, char *end) {
   __heaps *node = insert((__list **)target, sizeof(__heaps));
   node->base = base;
@@ -80,13 +84,12 @@ void insert_heaps(__heaps **target, char *base, char *end) {
   // insert那里malloc基本不可能失败
   node->buf = malloc(node->heap_size);
   if (node->buf == NULL) {
-    printf("Cannot allocate '%zu' byte memory...this may is a bug!please contract developer.\n", node->heap_size);
-    exit(1);
+    printf("Cannot allocate '%zu' byte memory...this may is a bug!please "
+           "contract developer.\n",
+           node->heap_size);
+    destroy_heaps(target);
+    exit(-1);
   }
-}
-void free_buf(__heaps *heap) { free(heap->buf); }
-void destroy_heaps(__heaps **node) {
-  destroy((__list **)node, (void (*)(void *))free_buf);
 }
 void insert_thread_ids(thread_ids **ids, pthread_t id) {
   thread_ids *node = insert((__list **)ids, sizeof(thread_ids));

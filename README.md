@@ -1,6 +1,8 @@
 # PVZ小工具
   * 本人仅在6.0.1与7.11的Android(32位)系统上测试过北美版的pvz
     ![pvz](doc/pvz.png)
+  * 效果
+    ![effect](doc/effect.png)
   * 需要Root权限
 ## 使用步骤
   * **获取一个北美版的植物大战僵尸**
