@@ -60,6 +60,7 @@ extern void insert_thread_ids(thread_ids **, pthread_t);
 extern void destroy_thread_ids(thread_ids **);
 extern void parseRowAndCol(const char *, __task **);
 extern void checkRootState();
-extern const char *readline(const Path);
+extern const char *readline(FILE *);
 extern pid_t findPVZProcess();
+extern FILE *openProcFile(pid_t, const char *);
 #endif //__UTILS__H

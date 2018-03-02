@@ -174,24 +174,36 @@ void checkRootState() {
     exit(-1);
   }
 }
-const char *readline(const Path file) {
+const char *readline(FILE *fp) {
   static BufferType buf;
-  FILE *fp = fopen(file, "r");
-  fgets(buf, BUFSIZE, fp);
+  if (fp == NULL)
+    return "";
+  if (fgets(buf, BUFSIZE, fp) == NULL) {
+    fclose(fp);
+    return "";
+  }
   fclose(fp);
   return buf;
+}
+FILE *openProcFile(pid_t pid, const char *file) {
+  static Path path;
+  sprintf(path, "/proc/%d/%s", pid, file);
+  return fopen(path, "r");
+}
+FILE *openCmdline(const char *pid) {
+  return openProcFile(atoi(pid), "cmdline");
+}
+const char *getPackageName(const char *pid) {
+  return readline(openCmdline(pid));
 }
 pid_t findPVZProcess() {
   DIR *dp = opendir("/proc");
   struct dirent *dirHandle;
   pid_t pid = -1;
-  Path packageNameProvider;
   while ((dirHandle = readdir(dp))) {
     // 文件名第一个字符是数字
     if (dirHandle->d_type & DT_DIR && isdigit(*dirHandle->d_name)) {
-      sprintf(packageNameProvider, "/proc/%s/cmdline", dirHandle->d_name);
-      if (strncmp(readline(packageNameProvider), SPECIFIC_PACKAGE,
-                  strlen(SPECIFIC_PACKAGE)) == 0) {
+      if (strcmp(getPackageName(dirHandle->d_name), SPECIFIC_PACKAGE) == 0) {
         pid = atoi(dirHandle->d_name);
         break;
       }

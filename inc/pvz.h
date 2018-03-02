@@ -23,16 +23,11 @@
 #define CARDS_PLAN_TPYE_OFF 0x8
 #define PUMPKIN_CODE (30)
 #define LILYPAD_CODE (16)
-struct {
+struct Hp {
   size_t curHp;
   size_t totalHp;
   size_t armor;
-} Hp;
-struct {
-  size_t newHp;
-  size_t totalHp;
-  size_t armor;
-} newHp;
+};
 jmp_buf env;
 pthread_mutex_t mutex;
 #endif //__PVZ__H

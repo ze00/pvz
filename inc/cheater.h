@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 #include "pvz_offset.h"
 #include "base.h"
 #include "scanmem.h"
@@ -31,18 +32,20 @@ void pvz_read(void *rp, void *buf, size_t len) {
 void *getBase(const char *spec, int findFirst,
               void (*action)(const char *, void *, void *), void *end) {
   void *base;
-  Path vmMaps;
-  sprintf(vmMaps, "/proc/%d/maps", baseInfo.pid);
-  FILE *maps = fopen(vmMaps, "r");
+  FILE *maps = openProcFile(baseInfo.pid, "maps");
   BufferType buf;
   while (fgets(buf, BUFSIZE, maps) != NULL) {
     if (strstr(buf, spec)) {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
       if (action == NULL)
-        sscanf(buf, "%x", (unsigned int *)&base);
+        sscanf(buf, "%" PRIx64, (unsigned int *)&base);
       else
         action(buf, &base, end);
       if (findFirst)
         break;
+#pragma GCC diagnostic pop
     }
   }
   fclose(maps);
@@ -60,10 +63,14 @@ void *getDynamicBase() {
 }
 void getBaseAndEnd(const char *buf, void __unused *base, void __unused *end) {
   void *f, *g;
-  sscanf(buf, "%x-%x", INTP(&f), INTP(&g));
+  // 禁止-Wformat的警告
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+  sscanf(buf, "%" PRIx64 "-%" PRIx64, &f, &g);
   // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
   // 不知道为什么这条代码会出问题
   insert_heaps(&baseInfo.heap, f, g);
+#pragma GCC diagnostic pop
 }
 void getHeapBase() {
   // 见kernel/Documentation/filesystems/proc.txt
@@ -97,12 +104,12 @@ void removeColdDown() {
   }
 }
 void letZombiesFragile(void *dp, void *rp) {
-  memcpy(&Hp, (char *)dp + ZOM_HP_OFF, sizeof(Hp));
-  if (Hp.curHp != 10 && IN_RANGE(Hp.totalHp, 270, 6000)) {
-    newHp.newHp = 10;
-    newHp.totalHp = 0;
-    newHp.armor = 0;
-    pvz_write((char *)rp + ZOM_HP_OFF, &newHp, sizeof(newHp));
+  struct Hp *hp = dp + ZOM_HP_OFF;
+  if (hp->curHp != 10 && IN_RANGE(hp->totalHp, 270, 6000)) {
+    hp->curHp = 10;
+    hp->totalHp = 0;
+    hp->armor = 0;
+    pvz_write((char *)rp + ZOM_HP_OFF, hp, sizeof(*hp));
   }
 }
 void coverZombies(void *dp, void *rp) {
