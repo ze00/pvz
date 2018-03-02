@@ -13,7 +13,6 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
 #include "pvz_offset.h"
 #include "base.h"
 #include "scanmem.h"

@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
   getHeapBase();
   if (baseInfo.heap == NULL) {
     printf("Failed to get heap base,please restart the game!\n");
+    exit(-1);
   }
   int option;
   BufferType buf;
