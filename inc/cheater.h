@@ -36,16 +36,12 @@ void *getBase(const char *spec, int findFirst,
   BufferType buf;
   while (fgets(buf, BUFSIZE, maps) != NULL) {
     if (strstr(buf, spec)) {
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
       if (action == NULL)
-        sscanf(buf, "%" PRIx64, (unsigned int *)&base);
+        sscanf(buf, "%p", &base);
       else
         action(buf, &base, end);
       if (findFirst)
         break;
-#pragma GCC diagnostic pop
     }
   }
   fclose(maps);
@@ -63,14 +59,8 @@ void *getDynamicBase() {
 }
 void getBaseAndEnd(const char *buf, void __unused *base, void __unused *end) {
   void *f, *g;
-  // 禁止-Wformat的警告
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-  sscanf(buf, "%" PRIx64 "-%" PRIx64, &f, &g);
-  // sscanf(buf, "%8x-8x", (int *)base,(int *)end)
-  // 不知道为什么这条代码会出问题
+  sscanf(buf, "%p-%p", &f, &g);
   insert_heaps(&baseInfo.heap, f, g);
-#pragma GCC diagnostic pop
 }
 void getHeapBase() {
   // 见kernel/Documentation/filesystems/proc.txt
