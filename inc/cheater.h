@@ -195,13 +195,11 @@ void forEachZombies(void (*op)(void *)) {
   uint32_t zcnt = getI32(entry + getOffset("zombies_count"));
   vp = entry + getOffset("zombies_list");
   pvz_read(vp, &zp, sizeof(uint32_t));
-  printf("%zu\n", zcnt);
   for (uint32_t idx = 0; idx < zcnt; ++idx) {
     op(zp);
     vp += 0xc;
     pvz_read(vp, &zp, sizeof(uint32_t));
   }
-  printf("%p\n", vp);
 }
 #define ROW(lp) (getI32(lp + getOffset("zombies_row")) + 1)
 #define COL(lp) (getF32(lp + getOffset("zombies_pos_y")))
