@@ -28,6 +28,16 @@ void pvz_read(void *rp, void *buf, size_t len) {
     exit(-1);
   }
 }
+int32_t getI32(void *rp) {
+  static int32_t val;
+  pvz_read(rp, &val, sizeof(val));
+  return val;
+}
+float getF32(void *rp) {
+  static float val;
+  pvz_read(rp, &val, sizeof(val));
+  return val;
+}
 void *getBase(const char *spec, int findFirst,
               void (*action)(const char *, void *, void *), void *end) {
   void *base;
@@ -92,20 +102,19 @@ void removeColdDown() {
     p -= 9;
   }
 }
-void letZombiesFragile(void *dp, void *rp) {
-  struct Hp *hp = dp + ZOM_HP_OFF;
-  if (hp->curHp != 10 && IN_RANGE(hp->totalHp, 270, 6000)) {
-    hp->curHp = 10;
-    hp->totalHp = 0;
-    hp->armor = 0;
-    pvz_write((char *)rp + ZOM_HP_OFF, hp, sizeof(*hp));
-  }
+void letZombiesFragile(void *rp) {
+  struct Hp hp = {
+      .curHp = 10,
+      .totalHp = 10,
+      .armor = 0,
+  };
+  pvz_write((char *)rp + ZOM_HP_OFF, &hp, sizeof(hp));
 }
-void coverZombies(void *dp, void *rp) {
-  pvz_write((char *)rp + 0x3c, "\x88\x13\x00\x00", sizeof(int32_t));
+void coverZombies(void *rp) {
+  pvz_write((char *)rp + 0xbc, "\x88\x13\x00\x00", sizeof(int32_t));
 }
-void increaseZombies(void *dp, void *rp) {
-  baseInfo.val = *((int32_t *)dp + ZOM_HP_OFF / sizeof(int32_t)) * 2;
+void increaseZombies(void *rp) {
+  baseInfo.val = getI32(rp + ZOM_HP_OFF) * 2;
   pvz_write((char *)rp + ZOM_HP_OFF, &baseInfo.val, sizeof(baseInfo.val));
 }
 void increaseCabbagePult() {
@@ -173,38 +182,34 @@ void *forEachPlants_child(void *my_arg) {
   }
   exit();
 }
-void forEachPlants(void (*op)(void *, void *)) {
-  forEach(forEachPlants_child, op);
-}
-void *forEachZombies_child(void *my_arg) {
-  init();
-  read();
-  size_t maxIndex = heap->heap_size - ZOM_HP_OFF;
-  int32_t *helper;
-  for (size_t i = 0; i < maxIndex; ++i) {
-    helper = (int32_t *)buf;
-    if (helper[0] == 0xffffffff && helper[1] == 0x0 &&
-        helper[2] == 0xffffffff && helper[3] == 0xffffffff && helper[4] == 0) {
-      call();
-    }
-    ++buf;
-  }
-  exit();
-}
-void forEachZombies(void (*op)(void *, void *)) {
-  forEach(forEachZombies_child, op);
-}
 #undef init
 #undef read
 #undef call
 #undef exit
-#define ROW(lp) (*INT32P(lp + getOffset("zombies_row")) + 1)
-#define COL(lp) (*(float *)(lp + getOffset("zombies_pos_y")))
-#define HP(lp) (*INT32P(lp + ZOM_HP_OFF))
-#define CODE(lp) (*INT32P(lp + getOffset("zombies_type")))
-void reportZombies(void *local, void *rp) {
-  printf("Found at %p (row@%d x pos_y@%f)(hp:%d code:%d)\n", rp, ROW(local),
-         COL(local), HP(local), CODE(local));
+void forEachPlants(void (*op)(void *, void *)) {
+  forEach(forEachPlants_child, op);
+}
+void forEachZombies(void (*op)(void *)) {
+  void *entry = baseInfo.base + getOffset("count_entry"), *vp, *zp;
+  pvz_read(entry, &entry, sizeof(uint32_t));
+  uint32_t zcnt = getI32(entry + getOffset("zombies_count"));
+  vp = entry + getOffset("zombies_list");
+  pvz_read(vp, &zp, sizeof(uint32_t));
+  printf("%zu\n", zcnt);
+  for (uint32_t idx = 0; idx < zcnt; ++idx) {
+    op(zp);
+    vp += 0xc;
+    pvz_read(vp, &zp, sizeof(uint32_t));
+  }
+  printf("%p\n", vp);
+}
+#define ROW(lp) (getI32(lp + getOffset("zombies_row")) + 1)
+#define COL(lp) (getF32(lp + getOffset("zombies_pos_y")))
+#define HP(lp) (getI32(lp + ZOM_HP_OFF))
+#define CODE(lp) (getI32(lp + getOffset("zombies_type")))
+void reportZombies(void *rp) {
+  printf("Found at %p(row@%d x pos_y@%f)(hp:%d code:%d)\n", rp, ROW(rp),
+         COL(rp), HP(rp), CODE(rp));
 }
 #undef ROW
 #undef COL
@@ -219,15 +224,14 @@ void increasePlantsAttack(void *dp, void *rp) {
   pvz_write((char *)rp + PLAN_ATT_TOTAL_OFF, &baseInfo.val,
             sizeof(baseInfo.val));
 }
-void putLadder(void *local, void *remote) {
+void putLadder(void *remote) {
 
   if (baseInfo.task != NULL) {
-    int32_t type = *(int32_t *)(local + getOffset("zombies_type"));
+    int32_t type = getI32(remote + getOffset("zombies_type"));
     if (type == 21) {
-      float f = baseInfo.task->col * 100, of;
+      float f = baseInfo.task->col * 100;
       int32_t row = baseInfo.task->row - 1;
-      pvz_read(remote + getOffset("zombies_pos_x"), &of, sizeof(of));
-      if (f > of)
+      if (f > getF32(remote + getOffset("zombies_pos_x")))
         return;
       pvz_write(remote + getOffset("zombies_row"), &row, sizeof(row));
       pvz_write(remote + getOffset("zombies_pos_x"), &f, sizeof(f));
