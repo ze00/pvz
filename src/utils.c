@@ -69,45 +69,6 @@ void recover_images(__images *node) {
     node = next(node);
   }
 }
-void free_buf(__heaps *heap) { free(heap->buf); }
-void destroy_heaps(__heaps **node) {
-  destroy((__list **)node, (void (*)(void *))free_buf);
-}
-void insert_heaps(__heaps **target, char *base, char *end) {
-  __heaps *node = insert((__list **)target, sizeof(__heaps));
-  node->base = base;
-  node->end = end;
-  node->heap_size = end - base;
-  printf("Found heap %p ... %p\n", base, end);
-  // 这里的malloc做一下检查
-  // 因为这里malloc的内存都比较大
-  // insert那里malloc基本不可能失败
-  node->buf = malloc(node->heap_size);
-  if (node->buf == NULL) {
-    printf("Cannot allocate '%zu' byte memory...this may is a bug!please "
-           "contract developer.\n",
-           node->heap_size);
-    destroy_heaps(target);
-    exit(-1);
-  }
-}
-void insert_thread_ids(thread_ids **ids, pthread_t id) {
-  thread_ids *node = insert((__list **)ids, sizeof(thread_ids));
-  node->id = id;
-}
-void destroy_thread_ids(thread_ids **ids) {
-  thread_ids *id = *ids;
-  while (id != NULL) {
-    // 等待线程退出
-    // 或许也必须pthread_join
-    // 应该再所有线程都退出后再回到游戏
-    // 否则ptrace时回到游戏
-    // 游戏已经被暂停了
-    pthread_join(id->id, NULL);
-    id = next(id);
-  }
-  destroy((__list **)ids, NULL);
-}
 void parseRowAndCol(const char *buf, __task **task) {
   const char *val = buf;
   int row, col;

@@ -21,12 +21,7 @@ void collect() {
   checkRootState();
   detectPVZ();
   baseInfo.base = getDynamicBase();
-  getHeapBase();
   getBssBase();
-  if (baseInfo.heap == NULL) {
-    printf("Failed to get heap base,please restart the game!\n");
-    exit(-1);
-  }
 }
 int main(int argc, char **argv) {
   collect();
@@ -123,13 +118,11 @@ int main(int argc, char **argv) {
       forEachPlants(plants_attack);
       break;
     case 15:
-      destroy_heaps(&baseInfo.heap);
       return 0;
     default:
       printf("输入错误...\n");
     }
   }
-  destroy_heaps(&baseInfo.heap);
   return 0;
 }
 #undef GETOPT

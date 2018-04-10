@@ -29,5 +29,4 @@ struct Hp {
   size_t armor;
 };
 jmp_buf env;
-pthread_mutex_t mutex;
 #endif //__PVZ__H

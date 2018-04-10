@@ -71,18 +71,9 @@ void detectPVZ() {
   printf("Found %s:%d\n", SPECIFIC_PACKAGE, pid);
   baseInfo.pid = pid;
 }
-void getHeapBaseAndEnd(void *base, void *end) {
-  insert_heaps(&baseInfo.heap, base, end);
-}
 void *getDynamicBase() {
   void *v;
   return getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, (void **)&v);
-}
-void getHeapBase() {
-  void *v;
-  // 见kernel/Documentation/filesystems/proc.txt
-  getBase("[anon:libc_malloc]", 0, getHeapBaseAndEnd, &v);
-  getBase("[heap]", 0, getHeapBaseAndEnd, &v);
 }
 void getBssBase() {
   getBase(SPECIFIC_DYNAMIC_LIBRARIES, 0, NULL, (void **)&baseInfo.bss);
@@ -112,70 +103,7 @@ void increaseCabbagePult() {
   char *p = baseInfo.base + getOffset("cabbage");
   setI32(p + 8, 45);
 }
-void forEach(void *(entry)(void *), void (*op)(void *, void *)) {
-  __heaps *heap = baseInfo.heap;
-  thread_ids *ids = NULL;
-  pthread_t id;
-  pthread_mutex_init(&mutex, NULL);
-  while (heap != NULL) {
-    // 此处使用malloc而不使用一个局部对象
-    // 可能会由于编译器的问题
-    // 每次进入while内
-    // 创建的arg都是同一个地址
-    thread_arg *arg = malloc(sizeof(thread_arg));
-    arg->heap = heap;
-    arg->callable = op;
-    pthread_create(&id, NULL, entry, arg);
-    // pthread_detach(id);
-    insert_thread_ids(&ids, id);
-    heap = next(heap);
-  }
-  // FIXME:如果有线程被中断
-  // 则内存泄露
-  destroy_thread_ids(&ids);
-  pthread_mutex_destroy(&mutex);
-}
-#define init()                                                                 \
-  thread_arg *arg = my_arg;                                                    \
-  __heaps *heap = arg->heap;                                                   \
-  char *buf = heap->buf;
 
-// 此处需要使用pthread_mutex_lock
-// 一个进程不能同时被ptrace
-#define read()                                                                 \
-  pthread_mutex_lock(&mutex);                                                  \
-  pvz_read(heap->base, buf, heap->heap_size);                                  \
-  pthread_mutex_unlock(&mutex);
-
-// arg->callable可能会使用pvz_write
-#define call()                                                                 \
-  pthread_mutex_lock(&mutex);                                                  \
-  arg->callable(helper, heap->base + i);                                       \
-  pthread_mutex_unlock(&mutex);
-
-#define exit()                                                                 \
-  free(arg);                                                                   \
-  pthread_exit(NULL);
-
-void *forEachPlants_child(void *my_arg) {
-  init();
-  read();
-  size_t maxIndex = heap->heap_size - PLAN_HP_TOTAL_OFF;
-  int32_t *helper;
-  for (size_t i = 0; i < maxIndex; ++i) {
-    helper = (int32_t *)buf;
-    if (helper[0] == 0x43200000 && helper[1] == 0x42200000 && helper[2] == 1 &&
-        IN_RANGE(helper[PLAN_HP_TOTAL_OFF / sizeof(int32_t)], 300, 8000)) {
-      call();
-    }
-    ++buf;
-  }
-  exit();
-}
-#undef init
-#undef read
-#undef call
-#undef exit
 void *getField() {
   void *helper = getP32(baseInfo.bss + getOffset("base"));
   return getOffset("field") + helper;
@@ -184,8 +112,19 @@ void *getStatus() {
   void *status = getP32(getField() + getOffset("status"));
   return status;
 }
-void forEachPlants(void (*op)(void *, void *)) {
-  forEach(forEachPlants_child, op);
+void forEachPlants(void (*op)(void *)) {
+  size_t pcnt = getI32(getStatus() + getOffset("plants_count"));
+  int32_t *entry = getP32(getStatus() + getOffset("plants_list"));
+  void *pp;
+  for (size_t idx = 0; idx < pcnt;) {
+    pp = getP32(entry);
+    if (pp > (void *)0x10000000) {
+      op(pp);
+      entry++;
+      idx++;
+    }
+    entry++;
+  }
 }
 void forEachZombies(void (*op)(void *)) {
   size_t zcnt = getI32(getStatus() + getOffset("zombies_count"));
@@ -218,13 +157,11 @@ void reportZombies(void *rp) {
 #undef COL
 #undef HP
 #undef CODE
-void increasePlants(void *dp, void *rp) {
-  baseInfo.val = (*(int32_t *)((char *)dp + PLAN_HP_OFF)) * 2;
-  setI32(rp + PLAN_HP_OFF, baseInfo.val);
+void increasePlants(void *remote) {
+  setI32(remote + PLAN_HP_OFF, getI32(remote + PLAN_HP_OFF) * 2);
 }
-void increasePlantsAttack(void *dp, void *rp) {
-  baseInfo.val = (*(int32_t *)((char *)dp + PLAN_ATT_TOTAL_OFF)) / 2;
-  setI32(rp + PLAN_ATT_TOTAL_OFF, baseInfo.val);
+void increasePlantsAttack(void *remote) {
+  setI32(remote + PLAN_ATT_TOTAL_OFF, getI32(remote + PLAN_ATT_TOTAL_OFF) / 2);
 }
 void putLadder(void *remote) {
 
@@ -243,18 +180,18 @@ void putLadder(void *remote) {
     }
   }
 }
-#define ROW(lp) (*INT32P(lp + getOffset("plants_row")) + 1)
-#define COL(lp) (*INT32P(lp + getOffset("plants_col")) + 1)
-#define HP(lp) (*INT32P(lp + PLAN_HP_OFF))
-#define CODE(lp) (*INT32P(lp + getOffset("plants_type")))
-#define ATTACK(lp) (*INT32P(lp + getOffset("plants_attack")))
-void reportPlants(void *plant, void *rp) {
-  printf("Found at %p (row@%d x col@%d)(hp:%d code:%d)\n", rp, ROW(plant),
-         COL(plant), HP(plant), CODE(plant));
+#define ROW(lp) (getI32(lp + getOffset("plants_row")) + 1)
+#define COL(lp) (getI32(lp + getOffset("plants_col")) + 1)
+#define HP(lp) (getI32(lp + PLAN_HP_OFF))
+#define CODE(lp) (getI32(lp + getOffset("plants_type")))
+#define ATTACK(lp) (getI32(lp + getOffset("plants_attack")))
+void reportPlants(void *remote) {
+  printf("Found at %p (row@%d x col@%d)(hp:%d code:%d)\n", remote, ROW(remote),
+         COL(remote), HP(remote), CODE(remote));
 }
-void fuck_LilyPad_Pumpkin(void *local, void *remote) {
-  if (has(baseInfo.task, ROW(local), COL(local))) {
-    switch (CODE(local)) {
+void fuck_LilyPad_Pumpkin(void *remote) {
+  if (has(baseInfo.task, ROW(remote), COL(remote))) {
+    switch (CODE(remote)) {
     case LILYPAD_CODE:
       setI32(remote + getOffset("plants_vis"), 0);
       break;
@@ -263,14 +200,14 @@ void fuck_LilyPad_Pumpkin(void *local, void *remote) {
     }
   }
 }
-void plants_freeze(void *local, void *remote) {
-  if (ATTACK(local) == 0)
+void plants_freeze(void *remote) {
+  if (ATTACK(remote) == 0)
     return;
-  insert_images(&baseInfo.images, ATTACK(local),
+  insert_images(&baseInfo.images, ATTACK(remote),
                 remote + getOffset("plants_attack"));
   setI32(remote + getOffset("plants_attack"), 0);
 }
-void plants_attack(void *local, void *remote) {
+void plants_attack(void *remote) {
   recover_images(baseInfo.images);
   destroy((__list **)&baseInfo.images, NULL);
 }

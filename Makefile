@@ -1,6 +1,4 @@
 MODULE := \
-	patcher \
-	elfreader \
 	cheater
 inc := $(shell find inc)
 CC_FLAG := -g -Iinc -Wall -std=c99 -pthread
