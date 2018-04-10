@@ -20,7 +20,7 @@
 void collect() {
   checkRootState();
   detectPVZ();
-  getDynamicBase();
+  baseInfo.base = getDynamicBase();
   getHeapBase();
   getBssBase();
   if (baseInfo.heap == NULL) {

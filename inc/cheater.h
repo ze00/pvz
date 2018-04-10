@@ -75,7 +75,8 @@ void getHeapBaseAndEnd(void *base, void *end) {
   insert_heaps(&baseInfo.heap, base, end);
 }
 void *getDynamicBase() {
-  return getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, (void **)&baseInfo.base);
+  void *v;
+  return getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, (void **)&v);
 }
 void getHeapBase() {
   void *v;
@@ -89,9 +90,9 @@ void getBssBase() {
 
 void removeColdDown() {
   char *base = baseInfo.base;
-  int32_t *p = (int32_t *)(base + getOffset("cannon")), val = 0;
+  int32_t *p = (int32_t *)(base + getOffset("cannon"));
   for (size_t i = 0; i < 48; ++i) {
-    setI32(p, val);
+    setI32(p, 0);
     p -= 9;
   }
 }
@@ -105,8 +106,7 @@ void letZombiesFragile(void *rp) {
 }
 void coverZombies(void *rp) { setI32(rp + 0xbc, 5000); }
 void increaseZombies(void *rp) {
-  baseInfo.val = getI32(rp + ZOM_HP_OFF) * 2;
-  setI32(rp + ZOM_HP_OFF, baseInfo.val);
+  setI32(rp + ZOM_HP_OFF, getI32(rp + ZOM_HP_OFF) * 2);
 }
 void increaseCabbagePult() {
   char *p = baseInfo.base + getOffset("cabbage");
@@ -256,12 +256,10 @@ void fuck_LilyPad_Pumpkin(void *local, void *remote) {
   if (has(baseInfo.task, ROW(local), COL(local))) {
     switch (CODE(local)) {
     case LILYPAD_CODE:
-      baseInfo.val = 0;
-      setI32(remote + getOffset("plants_vis"), baseInfo.val);
+      setI32(remote + getOffset("plants_vis"), 0);
       break;
     case PUMPKIN_CODE:
-      baseInfo.val = 1332;
-      setI32(remote + getOffset("plants_hp"), baseInfo.val);
+      setI32(remote + getOffset("plants_hp"), 1332);
     }
   }
 }
@@ -270,8 +268,7 @@ void plants_freeze(void *local, void *remote) {
     return;
   insert_images(&baseInfo.images, ATTACK(local),
                 remote + getOffset("plants_attack"));
-  baseInfo.val = 0;
-  setI32(remote + getOffset("plants_attack"), baseInfo.val);
+  setI32(remote + getOffset("plants_attack"), 0);
 }
 void plants_attack(void *local, void *remote) {
   recover_images(baseInfo.images);
