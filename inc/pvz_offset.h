@@ -59,25 +59,15 @@ struct pvz_offset pvz_off_tbl[] = {
     {"plants_hp", 0x28},
     // 植物攻击力
     {"plants_attack", 0x30},
-    // 场景特效代码的偏移
-    {"field_effect_code", 0x2e7d8},
-    // FIXME:以下两个偏移是动态的
-    // 场景
-    {"field_code", 0x78aa40},
-    // 冒险关卡进度
-    {"adventure_progress", 0x78aa44},
-    // 可以找到.bss植物/僵尸的列表
-    {"count_entry", 0xc2b780},
-    // 于.bbs
-    {"zombies_list_actu", 0x8364c},
-    {"zombies_count_actu", 0xc07c},
-    {"plants_count_actu", 0xc054},
-    // 于libpvz
-    // +0xC下一个
-    {"zombies_list", 0x77660},
-    {"zombies_count", 0x9c},
-    {"plants_list", 0x776e4},
-    {"plants_count", 0x74},
+    // bss + base
+    {"base", 0x5138c8},
+    // *base + 0x2dfa0
+    {"field", 0x2dfa0},
+    // field + 0x7c8
+    {"status", 0x7c8},
+    // status + ...
+    {"zombies_list", 0xb4},
+    {"zombies_count", 0xc4},
 };
 off_t getOffset(const char *name) {
   off_t off = -1;

@@ -17,6 +17,7 @@
 #include "utils.h"
 struct {
   char *base;
+  char *bss;
   __heaps *heap;
   int32_t val;
   pid_t pid;
@@ -25,6 +26,7 @@ struct {
 } baseInfo;
 void initBase() {
   baseInfo.base = NULL;
+  baseInfo.bss = NULL;
   baseInfo.heap = NULL;
   baseInfo.task = NULL;
   baseInfo.images = NULL;

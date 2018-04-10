@@ -33,22 +33,28 @@ int32_t getI32(void *rp) {
   pvz_read(rp, &val, sizeof(val));
   return val;
 }
+void *getP32(void *rp) {
+  static void *val;
+  pvz_read(rp, &val, sizeof(val));
+  return val;
+}
 float getF32(void *rp) {
   static float val;
   pvz_read(rp, &val, sizeof(val));
   return val;
 }
-void *getBase(const char *spec, int findFirst,
-              void (*action)(const char *, void *, void *), void *end) {
+void setI32(void *rp, int32_t v) { pvz_write(rp, &v, sizeof(v)); }
+void setF32(void *rp, float v) { pvz_write(rp, &v, sizeof(v)); }
+void *getBase(const char *spec, int findFirst, void (*action)(void *, void *),
+              void **end) {
   void *base;
   FILE *maps = openProcFile(baseInfo.pid, "maps");
   BufferType buf;
   while (fgets(buf, BUFSIZE, maps) != NULL) {
     if (strstr(buf, spec)) {
-      if (action == NULL)
-        sscanf(buf, "%p", &base);
-      else
-        action(buf, &base, end);
+      sscanf(buf, "%p-%p", &base, end);
+      if (action != NULL)
+        action(base, *end);
       if (findFirst)
         break;
     }
@@ -56,7 +62,7 @@ void *getBase(const char *spec, int findFirst,
   fclose(maps);
   return base;
 }
-void *getDynamicBase() {
+void detectPVZ() {
   pid_t pid = findPVZProcess();
   if (pid == -1) {
     printf("cannot locate '%s'\n", SPECIFIC_PACKAGE);
@@ -64,41 +70,28 @@ void *getDynamicBase() {
   }
   printf("Found %s:%d\n", SPECIFIC_PACKAGE, pid);
   baseInfo.pid = pid;
-  return getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, NULL);
 }
-void getBaseAndEnd(const char *buf, void __unused *base, void __unused *end) {
-  void *f, *g;
-  sscanf(buf, "%p-%p", &f, &g);
-  insert_heaps(&baseInfo.heap, f, g);
+void getHeapBaseAndEnd(void *base, void *end) {
+  insert_heaps(&baseInfo.heap, base, end);
+}
+void *getDynamicBase() {
+  return getBase(SPECIFIC_DYNAMIC_LIBRARIES, 1, NULL, (void **)&baseInfo.base);
 }
 void getHeapBase() {
+  void *v;
   // 见kernel/Documentation/filesystems/proc.txt
-  getBase("[anon:libc_malloc]", 0, getBaseAndEnd, NULL);
-  getBase("[heap]", 0, getBaseAndEnd, NULL);
+  getBase("[anon:libc_malloc]", 0, getHeapBaseAndEnd, &v);
+  getBase("[heap]", 0, getHeapBaseAndEnd, &v);
+}
+void getBssBase() {
+  getBase(SPECIFIC_DYNAMIC_LIBRARIES, 0, NULL, (void **)&baseInfo.bss);
 }
 
-void changeCoins() {
-  char *helper = baseInfo.base + getOffset("coins"),
-       *bp = helper + COINS_HELPER_OFF, *hp = bp;
-  char buf[COINS_HELPER_BUFF];
-  // baseInfo.base + getOffset("coins") + 0x7aa400;
-  pvz_read(bp, buf, COINS_HELPER_BUFF);
-  hp = buf;
-  off_t off;
-  for (off = 0; off < sizeof(buf); ++off) {
-    if (*(intptr_t *)hp == (intptr_t)helper) {
-      break;
-    }
-    hp++;
-  }
-  pvz_write(bp + off - 4, &baseInfo.val, sizeof(baseInfo.val));
-  printf("now set coins to %d\n", baseInfo.val);
-}
 void removeColdDown() {
   char *base = baseInfo.base;
   int32_t *p = (int32_t *)(base + getOffset("cannon")), val = 0;
   for (size_t i = 0; i < 48; ++i) {
-    pvz_write(p, &val, sizeof(val));
+    setI32(p, val);
     p -= 9;
   }
 }
@@ -110,17 +103,14 @@ void letZombiesFragile(void *rp) {
   };
   pvz_write((char *)rp + ZOM_HP_OFF, &hp, sizeof(hp));
 }
-void coverZombies(void *rp) {
-  pvz_write((char *)rp + 0xbc, "\x88\x13\x00\x00", sizeof(int32_t));
-}
+void coverZombies(void *rp) { setI32(rp + 0xbc, 5000); }
 void increaseZombies(void *rp) {
   baseInfo.val = getI32(rp + ZOM_HP_OFF) * 2;
-  pvz_write((char *)rp + ZOM_HP_OFF, &baseInfo.val, sizeof(baseInfo.val));
+  setI32(rp + ZOM_HP_OFF, baseInfo.val);
 }
 void increaseCabbagePult() {
   char *p = baseInfo.base + getOffset("cabbage");
-  int32_t v = 45;
-  pvz_write(p + 8, &v, sizeof(v));
+  setI32(p + 8, 45);
 }
 void forEach(void *(entry)(void *), void (*op)(void *, void *)) {
   __heaps *heap = baseInfo.heap;
@@ -186,19 +176,34 @@ void *forEachPlants_child(void *my_arg) {
 #undef read
 #undef call
 #undef exit
+void *getField() {
+  void *helper = getP32(baseInfo.bss + getOffset("base"));
+  return getOffset("field") + helper;
+}
+void *getStatus() {
+  void *status = getP32(getField() + getOffset("status"));
+  return status;
+}
 void forEachPlants(void (*op)(void *, void *)) {
   forEach(forEachPlants_child, op);
 }
 void forEachZombies(void (*op)(void *)) {
-  void *entry = baseInfo.base + getOffset("count_entry"), *vp, *zp;
-  pvz_read(entry, &entry, sizeof(uint32_t));
-  uint32_t zcnt = getI32(entry + getOffset("zombies_count"));
-  vp = entry + getOffset("zombies_list");
-  pvz_read(vp, &zp, sizeof(uint32_t));
-  for (uint32_t idx = 0; idx < zcnt; ++idx) {
-    op(zp);
-    vp += 0xc;
-    pvz_read(vp, &zp, sizeof(uint32_t));
+  size_t zcnt = getI32(getStatus() + getOffset("zombies_count"));
+  int32_t *entry = getP32(getStatus() + getOffset("zombies_list"));
+  void *zp;
+  for (size_t idx = 0; idx < zcnt;) {
+    // 在僵尸地址前
+    // 有一些小的数据
+    // 不知道干嘛的
+    zp = getP32(entry);
+    if (zp > (void *)0x10000000) {
+      op(zp);
+      idx++;
+      // 僵尸地址后面有一个指针
+      // 同不知道干嘛的
+      entry++;
+    }
+    entry++;
   }
 }
 #define ROW(lp) (getI32(lp + getOffset("zombies_row")) + 1)
@@ -215,12 +220,11 @@ void reportZombies(void *rp) {
 #undef CODE
 void increasePlants(void *dp, void *rp) {
   baseInfo.val = (*(int32_t *)((char *)dp + PLAN_HP_OFF)) * 2;
-  pvz_write((char *)rp + PLAN_HP_OFF, &baseInfo.val, sizeof(baseInfo.val));
+  setI32(rp + PLAN_HP_OFF, baseInfo.val);
 }
 void increasePlantsAttack(void *dp, void *rp) {
   baseInfo.val = (*(int32_t *)((char *)dp + PLAN_ATT_TOTAL_OFF)) / 2;
-  pvz_write((char *)rp + PLAN_ATT_TOTAL_OFF, &baseInfo.val,
-            sizeof(baseInfo.val));
+  setI32(rp + PLAN_ATT_TOTAL_OFF, baseInfo.val);
 }
 void putLadder(void *remote) {
 
@@ -231,9 +235,9 @@ void putLadder(void *remote) {
       int32_t row = baseInfo.task->row - 1;
       if (f > getF32(remote + getOffset("zombies_pos_x")))
         return;
-      pvz_write(remote + getOffset("zombies_row"), &row, sizeof(row));
-      pvz_write(remote + getOffset("zombies_pos_x"), &f, sizeof(f));
-      pvz_write(remote + getOffset("zombies_pos_y"), &f, sizeof(f));
+      setI32(remote + getOffset("zombies_row"), row);
+      setF32(remote + getOffset("zombies_pos_x"), f);
+      setF32(remote + getOffset("zombies_pos_y"), f);
       printf("put ladder on %d:%d\n", baseInfo.task->row, baseInfo.task->col);
       pop(&baseInfo.task);
     }
@@ -253,13 +257,11 @@ void fuck_LilyPad_Pumpkin(void *local, void *remote) {
     switch (CODE(local)) {
     case LILYPAD_CODE:
       baseInfo.val = 0;
-      pvz_write(remote + getOffset("plants_vis"), &baseInfo.val,
-                sizeof(baseInfo.val));
+      setI32(remote + getOffset("plants_vis"), baseInfo.val);
       break;
     case PUMPKIN_CODE:
       baseInfo.val = 1332;
-      pvz_write(remote + getOffset("plants_hp"), &baseInfo.val,
-                sizeof(baseInfo.val));
+      setI32(remote + getOffset("plants_hp"), baseInfo.val);
     }
   }
 }
@@ -269,13 +271,13 @@ void plants_freeze(void *local, void *remote) {
   insert_images(&baseInfo.images, ATTACK(local),
                 remote + getOffset("plants_attack"));
   baseInfo.val = 0;
-  pvz_write(remote + getOffset("plants_attack"), &baseInfo.val,
-            sizeof(baseInfo.val));
+  setI32(remote + getOffset("plants_attack"), baseInfo.val);
 }
 void plants_attack(void *local, void *remote) {
   recover_images(baseInfo.images);
   destroy((__list **)&baseInfo.images, NULL);
 }
+void changeCoins() {}
 #undef ROW
 #undef COL
 #undef HP

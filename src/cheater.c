@@ -17,14 +17,19 @@
 #include "base.h"
 #include "pvz.h"
 #include "cheater.h"
-int main(int argc, char **argv) {
+void collect() {
   checkRootState();
-  baseInfo.base = getDynamicBase();
+  detectPVZ();
+  getDynamicBase();
   getHeapBase();
+  getBssBase();
   if (baseInfo.heap == NULL) {
     printf("Failed to get heap base,please restart the game!\n");
     exit(-1);
   }
+}
+int main(int argc, char **argv) {
+  collect();
   int option;
   BufferType buf;
   registeSigHandle();
