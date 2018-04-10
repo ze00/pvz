@@ -93,7 +93,7 @@ void letZombiesFragile(void *rp) {
       .totalHp = 10,
       .armor = 0,
   };
-  pvz_write((char *)rp + ZOM_HP_OFF, &hp, sizeof(hp));
+  pvz_write(rp + ZOM_HP_OFF, &hp, sizeof(hp));
 }
 void coverZombies(void *rp) { setI32(rp + 0xbc, 5000); }
 void increaseZombies(void *rp) {

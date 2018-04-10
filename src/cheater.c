@@ -22,6 +22,7 @@ void collect() {
   detectPVZ();
   baseInfo.base = getDynamicBase();
   getBssBase();
+  printf("基址:%p\n", getField());
 }
 int main(int argc, char **argv) {
   collect();
