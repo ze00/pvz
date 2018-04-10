@@ -1,8 +1,9 @@
 MODULE := \
 	cheater
+cheater_src := scanmem/ptrace.c src/cheater.c src/utils.c
 inc := $(shell find inc)
-CC_FLAG := -g -Iinc -Wall -std=c99 -pthread
-CC_FLAG += -DHAVE_PROCMEM -DDEBUG
+CC_FLAG := -Iinc -Wall -std=c99
+CC_FLAG += -DHAVE_PROCMEM
 ifeq ($(NDK_BUILD),true)
   NDK ?= $(HOME)/android-ndk-r14b
   ifeq ($(ARM64),true)
@@ -22,8 +23,6 @@ else
 	STRIP := strip
 endif
 all:$(MODULE)
-$(foreach m,$(MODULE),$(eval $(m)_src := src/$(m).c))
-cheater_src += ptrace.c src/utils.c
 $(foreach m,$(MODULE),$(eval TARGET := $(m))$(eval DEP := $($(m)_src) $(inc))$(eval include build/reg_rule.mk))
 define make_release
 	make NDK_BUILD=true --no-print-directory $(1)

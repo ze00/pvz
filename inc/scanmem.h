@@ -1,1 +1,1 @@
-../scanmem.h
+../scanmem/scanmem.h

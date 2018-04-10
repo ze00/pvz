@@ -1,8 +1,8 @@
 # PVZ小工具
   * 本人仅在6.0.1与7.11的Android(32位)系统上测试过北美版的pvz
-    ![pvz](doc/pvz.png)
+    ![pvz](images/pvz.png)
   * 效果
-    ![effect](doc/effect.png)
+    ![effect](images/effect.png)
   * 需要Root权限
 ## 使用步骤
   * **获取一个北美版的植物大战僵尸**
@@ -27,8 +27,8 @@
     https://www.coolapk.com/apk/io.neoterm
 
     安装完之后第一次打开将会下载几mb的东西，安装即可
-    ![neoterm_first_run](doc/neoterm_first_run.png)
-    ![neoterm_installing_component](doc/neoterm_installing_component.png)
+    ![neoterm_first_run](images/neoterm_first_run.png)
+    ![neoterm_installing_component](images/neoterm_installing_component.png)
   * 获取修改器程序
 
     打开你安装的NeoTerm
@@ -38,8 +38,8 @@
     apt install curl
     curl https://raw.githubusercontent.com/ze00/pvz/master/install.sh | sh
     ```
-    ![neoterm_installing_curl](doc/neoterm_installing_curl.png)
-    ![neoterm_installing_cheater](doc/neoterm_installing_cheater.png)
+    ![neoterm_installing_curl](images/neoterm_installing_curl.png)
+    ![neoterm_installing_cheater](images/neoterm_installing_cheater.png)
   * 运行修改器程序
 
     在NeoTerm内输入:
@@ -49,22 +49,22 @@
     如果您已获取Root权限，则您的Root权限管理器会提示是否允许'NeoTerm使用Root权限'，点击允许即可
 
     与此同时，NeoTerm也将会变成类似于下图这样的提示
-    ![neoterm_obtain_root](doc/neoterm_obtain_root.png)
+    ![neoterm_obtain_root](images/neoterm_obtain_root.png)
 
     在NeoTerm内输入:
     ```
     ./cheater
     ```
     如果您已经启动了植物大战僵尸，则应该是
-    ![cheater_suceess](doc/cheater_success.png)
+    ![cheater_suceess](images/cheater_success.png)
     否则，将会是
-    ![cheater_failure](doc/cheater_failure.png)
+    ![cheater_failure](images/cheater_failure.png)
 ## 如何获取更新的修改器程序
   * 很简单，只需要在NeoTerm下执行:
     ```
     apt install curl
     curl https://raw.githubusercontent.com/ze00/pvz/master/install.sh | sh
     ```
-    ![neoterm_installing_curl](doc/neoterm_installing_curl.png)
-    ![neoterm_installing_cheater](doc/neoterm_installing_cheater.png)
+    ![neoterm_installing_curl](images/neoterm_installing_curl.png)
+    ![neoterm_installing_cheater](images/neoterm_installing_cheater.png)
 REF:https://github.com/scanmem/scanmem
