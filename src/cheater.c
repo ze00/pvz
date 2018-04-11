@@ -48,7 +48,9 @@ int main(int argc, char **argv) {
     puts("13.所有植物不攻击");
     puts("14.恢复攻击");
     puts("15.输出调试信息");
-    puts("16.退出");
+    puts("16.过关");
+    puts("17.修改无尽选卡次数");
+    puts("18.退出");
 
 #define GETOPT(mess, opt)                                                      \
   printf(mess);                                                                \
@@ -62,10 +64,7 @@ int main(int argc, char **argv) {
       setSun();
       break;
     case 2:
-      while (1) {
-        forEachZombies(letZombiesFragile);
-        usleep(WAIT_USECONDS);
-      }
+      forEachZombies(letZombiesFragile);
       break;
     case 3:
       increaseCabbagePult();
@@ -123,6 +122,13 @@ int main(int argc, char **argv) {
       printf("状态与信息:%p 基址:%p\n", getStatus(), getField());
       break;
     case 16:
+      pass();
+      break;
+    case 17:
+      GETOPT("更改为?", baseInfo.val);
+      setFlags();
+      break;
+    case 18:
       return 0;
     default:
       printf("输入错误...\n");
