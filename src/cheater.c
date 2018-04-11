@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     puts("");
   }
   while (1) {
-    puts("1.改金币");
+    puts("1.改阳光");
     puts("2.僵尸秒杀");
     puts("3.卷心菜投手加强");
     puts("4.无冷却");
@@ -47,7 +47,8 @@ int main(int argc, char **argv) {
     puts("12.炸荷叶烂南瓜");
     puts("13.所有植物不攻击");
     puts("14.恢复攻击");
-    puts("15.退出");
+    puts("15.输出调试信息");
+    puts("16.退出");
 
 #define GETOPT(mess, opt)                                                      \
   printf(mess);                                                                \
@@ -58,7 +59,7 @@ int main(int argc, char **argv) {
     switch (option) {
     case 1:
       GETOPT("更改为?", baseInfo.val);
-      changeCoins();
+      setSun();
       break;
     case 2:
       while (1) {
@@ -119,6 +120,9 @@ int main(int argc, char **argv) {
       forEachPlants(plants_attack);
       break;
     case 15:
+      printf("状态与信息:%p 基址:%p\n", getStatus(), getField());
+      break;
+    case 16:
       return 0;
     default:
       printf("输入错误...\n");

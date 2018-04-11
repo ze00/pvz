@@ -18,12 +18,8 @@ struct pvz_offset {
   const char *name;
   off_t offset;
 };
-// 辅助地址-0xfd2060
 struct pvz_offset pvz_off_tbl[] = {
-    // 金币的辅助地址
-    // 真正的金币地址需要这个辅助地址来计算得出
-    // 但在不同的手机上可能找不到真正的金币地址
-    {"coins", -0xfd2060},
+    {"sun", 0x56bc},
     // 卷心菜头手的射速
     {"cabbage", 0xc44460},
     // 炮的冷却偏移

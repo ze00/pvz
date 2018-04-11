@@ -211,7 +211,7 @@ void plants_attack(void *remote) {
   recover_images(baseInfo.images);
   destroy((__list **)&baseInfo.images, NULL);
 }
-void changeCoins() {}
+void setSun() { setI32(getStatus() + getOffset("sun"), baseInfo.val); }
 #undef ROW
 #undef COL
 #undef HP

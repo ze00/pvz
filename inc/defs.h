@@ -13,8 +13,6 @@
 #define BUFSIZE 255
 #define IN_RANGE(obj, min, max) (obj >= min && obj <= max)
 #define SETJMP_RET 0xff
-#define INTP(p) ((int *)(p))
-#define INT32P(p) ((int32_t *)(p))
 #define WAIT_USECONDS (500000)
 typedef char BufferType[BUFSIZE];
 typedef char Path[PATH_MAX];

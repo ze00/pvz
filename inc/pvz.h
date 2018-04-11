@@ -18,9 +18,6 @@
 #ifndef SPECIFIC_DYNAMIC_LIBRARIES
 #define SPECIFIC_DYNAMIC_LIBRARIES "libpvz.so"
 #endif
-#define COINS_HELPER_BUFF 256
-#define COINS_HELPER_OFF 0x7aa300
-#define CARDS_PLAN_TPYE_OFF 0x8
 #define PUMPKIN_CODE (30)
 #define LILYPAD_CODE (16)
 struct Hp {
