@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     puts("14.恢复攻击");
     puts("15.输出调试信息");
     puts("16.过关");
-    puts("17.修改无尽选卡次数");
+    puts("17.修改当前无尽轮数(*2)");
     puts("18.退出");
 
 #define GETOPT(mess, opt)                                                      \

@@ -214,8 +214,6 @@ void plants_attack(void *remote) {
 void setSun() { setI32(getStatus() + getOffset("sun"), baseInfo.val); }
 void pass() { setI32(getStatus() + getOffset("pass"), 1); }
 void setFlags() {
-  printf("FLAGS:%p\n",
-         getP32(getStatus() + getOffset("flags_helper")) + getOffset("flags"));
   setI32(getP32(getStatus() + getOffset("flags_helper")) + getOffset("flags"),
          baseInfo.val);
 }
