@@ -26,6 +26,7 @@ all:$(MODULE)
 $(foreach m,$(MODULE),$(eval TARGET := $(m))$(eval DEP := $($(m)_src) $(inc))$(eval include build/reg_rule.mk))
 define make_release
 	make NDK_BUILD=true --no-print-directory $(1)
+	@ mkdir release
 	@ cp cheater release/$(2)
 	@ make clean
 endef
@@ -35,4 +36,4 @@ release:
 	$(call make_release,ARM64=true,aarch64/cheater)
 .PHONY:clean
 clean:
-	-@ rm -rf $(MODULE)
+	-@ rm -rf $(MODULE) release

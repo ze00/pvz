@@ -236,6 +236,7 @@ void callLadder() {
   uint32_t *zom = getStatus() + getOffset("zombies_list");
   for (size_t idx = 0; idx < 2000; ++idx) {
     setI32(zom, 0x15);
+    ++zom;
   }
 }
 #undef ROW
