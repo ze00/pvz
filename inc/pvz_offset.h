@@ -24,8 +24,6 @@ struct pvz_offset pvz_off_tbl[] = {
     {"cabbage", 0xc44460},
     // 炮的冷却偏移
     {"cannon", 0xc4467c},
-    // 僵尸首地址
-    {"zombies_base", -0x80},
     // 僵尸类型代码
     {"zombies_type", 0x30},
     // 僵尸x坐标
@@ -35,8 +33,6 @@ struct pvz_offset pvz_off_tbl[] = {
     {"zombies_pos_y", 0x3c},
     // 僵尸的行
     {"zombies_row", 0x1c},
-    // 是否飞回家
-    {"zombies_back", 0xc4},
     // 僵尸雪亮
     {"zombies_hp", 0xd4},
     // 植物的列
