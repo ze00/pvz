@@ -49,8 +49,10 @@ int main(int argc, char **argv) {
     puts("14.恢复攻击");
     puts("15.输出调试信息");
     puts("16.过关");
-    puts("17.修改当前无尽轮数(*2)");
-    puts("18.退出");
+    puts("17.修改当前无尽轮数");
+    puts("18.只出梯子僵尸");
+    puts("19.阵型压力测试");
+    puts("20.退出");
 
 #define GETOPT(mess, opt)                                                      \
   printf(mess);                                                                \
@@ -129,6 +131,12 @@ int main(int argc, char **argv) {
       setFlags();
       break;
     case 18:
+      callLadder();
+      break;
+    case 19:
+      doLimits();
+      break;
+    case 20:
       return 0;
     default:
       printf("输入错误...\n");

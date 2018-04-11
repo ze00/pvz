@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "pvz_offset.h"
 #include "base.h"
 #include "scanmem.h"
@@ -114,7 +115,7 @@ void *getStatus() {
 }
 void forEachPlants(void (*op)(void *)) {
   size_t pcnt = getI32(getStatus() + getOffset("plants_count"));
-  int32_t *entry = getP32(getStatus() + getOffset("plants_list"));
+  int32_t *entry = getP32(getStatus() + getOffset("plants_entry"));
   void *pp;
   for (size_t idx = 0; idx < pcnt;) {
     pp = getP32(entry);
@@ -128,7 +129,7 @@ void forEachPlants(void (*op)(void *)) {
 }
 void forEachZombies(void (*op)(void *)) {
   size_t zcnt = getI32(getStatus() + getOffset("zombies_count"));
-  int32_t *entry = getP32(getStatus() + getOffset("zombies_list"));
+  int32_t *entry = getP32(getStatus() + getOffset("zombies_entry"));
   void *zp;
   for (size_t idx = 0; idx < zcnt;) {
     // 在僵尸地址前
@@ -216,6 +217,26 @@ void pass() { setI32(getStatus() + getOffset("pass"), 1); }
 void setFlags() {
   setI32(getP32(getStatus() + getOffset("flags_helper")) + getOffset("flags"),
          baseInfo.val);
+}
+void doLimits() {
+  uint32_t *zom = getStatus() + getOffset("zombies_list");
+  // 普僵 红眼 小丑 气球 冰车 舞王 海豚
+  static uint32_t candidate[] = {0, 0x20, 0x10, 0xf, 0xc, 0x8, 0xe};
+  static uint32_t which;
+  srand(time(NULL));
+  for (size_t iidx = 0; iidx < 20; ++iidx) {
+    for (size_t jidx = 0; jidx < 50; ++jidx) {
+      which = rand() % 7;
+      setI32(zom, candidate[which]);
+      ++zom;
+    }
+  }
+}
+void callLadder() {
+  uint32_t *zom = getStatus() + getOffset("zombies_list");
+  for (size_t idx = 0; idx < 2000; ++idx) {
+    setI32(zom, 0x15);
+  }
 }
 #undef ROW
 #undef COL
