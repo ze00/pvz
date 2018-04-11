@@ -111,6 +111,10 @@ void *getField() {
 }
 void *getStatus() {
   void *status = getP32(getField() + getOffset("status"));
+  if (status == NULL) {
+    printf("请先进入游戏\n");
+    longjmp(env, SETJMP_RET);
+  }
   return status;
 }
 void forEachPlants(void (*op)(void *)) {
