@@ -36,7 +36,7 @@ int32_t getI32(void *rp) {
 }
 void *getP32(void *rp) {
   static void *val;
-  pvz_read(rp, &val, sizeof(val));
+  pvz_read(rp, &val, sizeof(uint32_t));
   return val;
 }
 float getF32(void *rp) {
