@@ -36,4 +36,4 @@ release:
 	$(call make_release,ARM64=true,aarch64/cheater)
 .PHONY:clean
 clean:
-	-@ rm -rf $(MODULE) release
+	-@ rm -rf $(MODULE)
