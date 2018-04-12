@@ -21,9 +21,9 @@
 #define PUMPKIN_CODE (30)
 #define LILYPAD_CODE (16)
 struct Hp {
-  size_t curHp;
-  size_t totalHp;
-  size_t armor;
+  uint32_t curHp;
+  uint32_t totalHp;
+  uint32_t armor;
 };
 jmp_buf env;
 #endif //__PVZ__H
